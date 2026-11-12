@@ -216,7 +216,8 @@ function decorMaterial(genre) {   // genre : 'bati' | 'feuillage' | 'tronc' | 'r
     s.fragmentShader = 'uniform sampler2D tA,tAn,tB,tBn,tC,tCn;uniform float uTexOn;varying vec3 vPw,vNw;varying float vLy;\n' + s.fragmentShader
       .replace('#include <color_fragment>', `#include <color_fragment>
   vec3 bc=diffuseColor.rgb;vec3 nq=normalize(vNw),an=abs(nq);float lum=dot(bc,vec3(.3,.5,.2));
-  float toit=${genre === 'bati' ? 'smoothstep(.3,.45,an.y)*(1.-smoothstep(.93,.97,an.y))' : '0.'};
+  float mxc=max(bc.r,max(bc.g,bc.b)),sat=(mxc-min(bc.r,min(bc.g,bc.b)))/(mxc+.001);
+  float toit=${genre === 'bati' ? 'smoothstep(.3,.45,an.y)*(1.-smoothstep(.93,.97,an.y))*smoothstep(.3,.5,sat)' : '0.'};
   float boisM=${genre === 'tronc' ? '1.' : genre === 'bati' ? 'step(bc.g*1.1,bc.r)*step(bc.b*1.2,bc.g)*(1.-smoothstep(.2,.34,lum))*(1.-toit)' : '0.'};
   vec3 ah=an.x>an.z?vec3(0.,0.,1.):vec3(1.,0.,0.);vec3 av=vec3(0.,1.,0.);
   if(an.y>.93){ah=vec3(1.,0.,0.);av=vec3(0.,0.,-1.);}

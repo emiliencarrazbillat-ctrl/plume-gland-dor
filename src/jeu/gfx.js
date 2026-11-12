@@ -243,6 +243,7 @@ function cottage(g,v,farm){HN++;const k=HN%4,w=WLC[HN%4],r=RFC[HN%5],sc=SHC[HN%5
   if(farm){pt(g,'sph','#f0c93a',1.9,1.5,1.9,5.4,1.1,1.2);pt(g,'sph','#e0b62e',1.3,1.1,1.3,6.3,.8,-1.4);pt(g,'cyl','#8a5a30',.07,2.8,.07,4.2,1.4,2.6,0,0,.2);}
   else{pt(g,'cyl','#a8743c',.62,1.3,.62,-W/2-.9,.65,D/2+.5);for(const y of[.3,1])pt(g,'cyl','#4a3a2a',.66,.1,.66,-W/2-.9,y,D/2+.5);pt(g,'box','#b98a52',1,.9,1,W/2+.1,.45,D/2+1.1,0,.3);pt(g,'box','#8a5a30',1.04,.1,1.04,W/2+.1,.9,D/2+1.1,0,.3);}}
 function house(g,st,v){const w=v.w,D='#3a2416',T='#6b4a2e';let r=v.r;
+  if(st!=='cot'&&st!=='farm'){maison(g,st,v);bakeStatic(g);return;}   /* styles refaits : voir maisons.js */
   if(st==='cot'||st==='farm')cottage(g,v,st==='farm');
   else if(st==='tree'){pt(g,'cyl','#5e3c1e',2.1,6.4,2.1,0,3.2,0,0,0,0,true);pt(g,'sph',w,4.1,3,4.1,0,7.8,0);pt(g,'cone',r,5,3.6,5,0,10.9,0,0,0,0,true);pt(g,'sph','#6b4423',.5,.5,.5,0,12.8,0);pt(g,'box',D,1.3,2,.3,0,7.3,3.95);win(g,2.3,8.1,3.2,.6);win(g,-2.3,8.1,3.2,-.6);pt(g,'box','#8a5a30',.9,6.6,.2,0,3.2,2.3,-.12);pt(g,'cyl','#8a5a30',4.6,.25,4.6,0,6.2,0);}
   else if(st==='stilt'){for(const[x,z]of[[2.6,2.6],[-2.6,2.6],[2.6,-2.6],[-2.6,-2.6]])pt(g,'cyl','#3d3026',.3,3.6,.3,x,1.8,z);pt(g,'box','#4a3a2a',7.4,.3,7.4,0,3.5,0);pt(g,'box',w,6,3.6,6,0,5.4,0);pt(g,'pyr',r,5.6,3.2,5.6,0,8.8,0,0,Math.PI/4,0,true);pt(g,'box',D,1.3,2.3,.3,0,4.8,3.05);win(g,1.9,5.8,3,0);pt(g,'box','#4a3a2a',1,4.2,.2,0,1.7,4.4,-.45);lantern(g,3.2,3.4,3.5);}
