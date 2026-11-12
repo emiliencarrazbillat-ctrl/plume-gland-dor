@@ -9,7 +9,7 @@ const JOUR = 108, NUIT = 408, SOIR = 262;
 const LIEUX = [
   ['village_jour', 0, 48, JOUR], ['village_nuit', 0, 48, NUIT], ['village_soir', 0, 48, SOIR], ['lac_jour', 30, 78, JOUR], ['lac_nuit', 30, 78, NUIT], ['depart_jour', -1, 59, JOUR],
   ['foret', -190, 8, JOUR], ['collines', -80, 214, JOUR], ['marais', 195, 112, JOUR], ['neige', -40, -200, JOUR], ['desert', 150, -110, JOUR], ['automne', 120, 306, JOUR],
-  ['orages', -345, 222, JOUR], ['volcan', 295, -280, JOUR], ['molosse', 40, -320, JOUR], ['fort', 95, 26, JOUR],
+  ['orages', -345, 222, JOUR], ['volcan', 295, -280, JOUR], ['molosse', 40, -320, JOUR], ['fort', 95, 26, JOUR], ['fort_nuit', 95, 26, NUIT], ['entree_donjon', 60, -2, JOUR],
 ];
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -28,11 +28,11 @@ const LIEUX = [
   await p.evaluate(q => { __dbg.setQ(q); __dbg.S.hp = 114; }, Q);
   for (const [n, x, z, t] of LIEUX) {
     if (process.env.SEUL && !process.env.SEUL.split(',').includes(n)) continue;
-    await p.evaluate(([x, z, t]) => { for (const e of __dbg.ENT) { e.x += 0; } const w = __dbg.nearWalk(x, z); __dbg.P.x = w[0]; __dbg.P.z = w[1]; __dbg.S.time = t; __dbg.S.hp = 9999; __dbg.adv(4); __dbg.S.time = t; __dbg.adv(.1); }, [x, z, t]);
+    await p.evaluate(([x, z, t, court]) => { for (const e of __dbg.ENT) { e.x += 0; } const w = __dbg.nearWalk(x, z); __dbg.P.x = w[0]; __dbg.P.z = w[1]; __dbg.S.time = t; __dbg.S.hp = 9999; __dbg.adv(court ? .35 : 4); __dbg.S.time = t; __dbg.adv(.1); }, [x, z, t, n.startsWith('fort')]);
     await shot(n);
   }
-  if (!process.env.SEUL) {
-    await p.evaluate(() => { __dbg.S.time = 108; __dbg.enterDungeon('d1'); }); await p.waitForFunction(() => __dbg.area === 'd1', null, { timeout: 30000 }); await p.evaluate(() => __dbg.adv(1)); await shot('donjon');
+  if (!process.env.SEUL || process.env.SEUL.split(',').includes('donjon')) {
+    await p.evaluate(() => { __dbg.S.time = 108; __dbg.enterDungeon('d1'); }); await p.waitForFunction(() => __dbg.area === 'd1', null, { timeout: 30000 }); await p.evaluate(() => __dbg.adv(1)); await shot('donjon'); await p.evaluate(() => { __dbg.P.z = -30; __dbg.adv(2); }); await shot('donjon_2');
     await p.evaluate(() => __dbg.leaveDungeon()); await p.waitForFunction(() => __dbg.area === 'world', null, { timeout: 30000 });
     await p.evaluate(() => { const w = __dbg.nearWalk(0, 48); __dbg.P.x = w[0]; __dbg.P.z = w[1]; __dbg.S.time = 108; __dbg.adv(1); __dbg.toggleMenu(); }); await p.waitForTimeout(300); await shot('menu');
     const info = await p.evaluate(() => { __dbg.toggleMenu(); __dbg.adv(.1); const i = __dbg.renderer.info; i.autoReset = false; i.reset(); __dbg.frame(); i.autoReset = true; return { appels: i.render.calls, triangles: i.render.triangles, textures: i.memory.textures, geometries: i.memory.geometries }; });

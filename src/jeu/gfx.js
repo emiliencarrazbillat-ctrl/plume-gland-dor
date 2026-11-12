@@ -281,12 +281,11 @@ function buildStructures(){
     W.add(g);COL.push({x:v.x,z:v.z,r:2});const l=label(v.n,'#ffe9a8',1.15);l.position.set(v.x,y+10,v.z-3);W.add(l);
     if(v.st==='farm'){const[mx,mz]=[v.x+31,v.z-8],m=new THREE.Group();m.position.set(mx,height(mx,mz)-.3,mz);pt(m,'cone','#efe2c0',3.6,11,3.6,0,5.5,0,0,0,0,true);pt(m,'cone','#c9762b',3,2.6,3,0,12,0,0,0,0,true);const bl=new THREE.Group();bl.position.set(0,9.5,3);for(let i=0;i<4;i++){const b=pt(bl,'box','#f4efe6',1.3,6.5,.12,0,0,0);b.rotation.z=i*1.571;b.position.set(Math.sin(-i*1.571)*3.4,Math.cos(i*1.571)*3.4,0);}pt(bl,'sph','#6b4423',.5,.5,.5,0,0,0);m.add(bl);SPIN.push({m:bl});W.add(m);COL.push({x:mx,z:mz,r:3.6});}});
   for(const id in DUN){const d=DUN[id];const[x,z]=nearWalk(d[1],d[2]);d[1]=x;d[2]=z;const y=height(x,z),g=new THREE.Group();g.position.set(x,y,z);
-    pt(g,'dod','#6a6660',5.2,4.8,4.2,0,2.7,-2.6,0,0,0,true);pt(g,'dod','#57534e',2.6,3,2.4,-4.4,1.2,-.8,0,1,0,true);pt(g,'dod','#57534e',2.2,2.4,2,4.2,1,-.6,0,2,0,true);pt(g,'sph','#07060a',2.4,3,1.2,0,1.8,0);
+    entreeDonjon(g,d);   /* voir maisons.js */
     const ring=new THREE.Mesh(GEO.tor,glow(d[8]?'#ff5d5d':'#ffd86b',2.2));ring.scale.set(2.6,3.1,2);ring.position.set(0,1.9,.6);g.add(ring);
     const l=label(d[0]+' · Niv. '+d[3],d[8]?'#ff9c9c':'#ffffff',1.2);l.position.set(0,8.5,0);g.add(l);W.add(g);COL.push({x,z:z-3,r:3.8});DUNV[id]={g,ring};}
   for(const id in FORT){const f=FORT[id];const[x,z]=nearWalk(f[1],f[2]);f[1]=x;f[2]=z;const y=height(x,z),g=new THREE.Group();g.position.set(x,y,z);
-    for(let i=0;i<22;i++){const a=i/22*6.283;if(Math.abs(a-1.571)<.42)continue;const px=Math.cos(a)*12,pz=Math.sin(a)*12,hy=height(x+px,z+pz)-y;pt(g,'cyl','#6b4a2a',.55,5,.55,px,hy+2.3,pz,0,0,0,true);pt(g,'cone','#5a3c20',.55,1,.55,px,hy+5.3,pz,0,0,0,true);}
-    pt(g,'box','#7a7068',4,8,4,0,4,-4,0,0,0,true);pt(g,'box','#5f574f',5,1,5,0,8.4,-4,0,0,0,true);pt(g,'pyr','#4a3a2a',3.8,2.6,3.8,0,10.2,-4,0,Math.PI/4,0,true);win(g,0,5.6,-1.95);
+    fortDecor(g,f,x,y,z);   /* voir maisons.js */
     const fl=flag(g,0,-4,FACTION[f[4]].c,6,11);flag(g,5,9.5,FACTION[f[4]].c,6,height(x+5,z+9.5)-y);const fl2=FLAGS[FLAGS.length-1].children[0];
     const fire=new THREE.Mesh(GEO.cone,glow('#ff8a2b',2.6));fire.scale.set(.7,1.7,.7);fire.position.set(3,1,3);g.add(fire);SPIN.push({m:fire,fire:1});pt(g,'cyl','#3d2a1a',1,.3,1,3,.15,3);
     const tg=new THREE.Group();tg.position.set(-5,0,3);house(tg,'tent',{w:'#6a5a4a',r:FACTION[f[4]].c});tg.scale.setScalar(.7);g.add(tg);

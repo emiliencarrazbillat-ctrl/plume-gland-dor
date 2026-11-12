@@ -25,7 +25,7 @@ Toutes viennent de Poly Haven (https://polyhaven.com), licence CC0 (domaine publ
 | `tuiles_c.webp`, `tuiles_n.webp` | [clay_roof_tiles_02](https://polyhaven.com/a/clay_roof_tiles_02) | Toits |
 | `crepi_c.webp`, `crepi_n.webp` | [painted_plaster_wall](https://polyhaven.com/a/painted_plaster_wall) | Murs |
 | `bois_c.webp`, `bois_n.webp` | [wood_planks](https://polyhaven.com/a/wood_planks) | Colombages, pontons, troncs |
-| `paves_c.webp`, `paves_n.webp` | [cobblestone_floor_04](https://polyhaven.com/a/cobblestone_floor_04) | Réservée aux places de village (pas encore utilisée) |
+| `paves_c.webp`, `paves_n.webp` | [cobblestone_floor_04](https://polyhaven.com/a/cobblestone_floor_04) | Sol dallé des donjons |
 
 ## Modèles 3D, sons
 

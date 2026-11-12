@@ -79,3 +79,65 @@ function maison(g, st, v) {
     lampe(1.9, 3.3, 4.6);
   }
 }
+
+/* ───────── ENTRÉE DE DONJON ─────────
+   Une butte rocheuse percée d'un porche de pierre : piliers, voûte de claveaux, marches, deux torches.
+   L'anneau lumineux et l'étiquette sont posés par gfx.js, comme avant. */
+function entreeDonjon(g, d) {
+  const P1 = '#6a6660', P2 = '#57534e', P3 = '#7d7972', roc = () => pg('dj_roc', () => bosse(soude(new THREE.IcosahedronGeometry(1, 2)), .16, 31));
+  pm(g, roc(), P1, 0, 2.4, -2.9, 0, .4, 0, 5.5, 4.7, 4.3); pm(g, roc(), P2, -4.6, 1.1, -1.0, 0, 1, 0, 2.7, 2.9, 2.5); pm(g, roc(), P2, 4.4, .9, -.8, 0, 2, 0, 2.3, 2.3, 2.1); pm(g, roc(), P3, .6, 5.7, -3.4, 0, .9, 0, 2.7, 1.6, 2.4); pm(g, roc(), P2, -2.6, .5, 2.6, 0, 3, 0, .9, .7, .8); pm(g, roc(), P1, 3.4, .4, 2.9, 0, 4, 0, .7, .55, .7);
+  pt(g, 'sph', '#07060a', 2.4, 3, 1.2, 0, 1.8, 0);
+  for (const s of [1, -1]) { pt(g, 'box', P3, 1.15, 4.3, 1.4, s * 2.75, 2.15, .55); pt(g, 'box', P2, 1.5, .5, 1.75, s * 2.75, .25, .55); pt(g, 'box', P1, 1.45, .4, 1.7, s * 2.75, 4.45, .55);
+    pt(g, 'cyl', '#3a2a1a', .14, 2.8, .14, s * 4.1, 1.4, 2.0); pt(g, 'cyl', '#2a2622', .34, .3, .34, s * 4.1, 2.9, 2.0); const f = new THREE.Mesh(GEO.cone, glow(d[8] ? '#ff5a3a' : '#ff9a2b', 2.6)); f.scale.set(.32, .8, .32); f.position.set(s * 4.1, 3.5, 2.0); g.add(f); SPIN.push({ m: f, fire: 1 }); }
+  for (let i = 0; i < 7; i++) { const a = Math.PI * (i + .5) / 7; pt(g, 'box', i % 2 ? P3 : P1, 1.25, .95, 1.45, Math.cos(a) * 2.75, 4.5 + Math.sin(a) * 1.7, .55, 0, 0, a - Math.PI / 2); }
+  pt(g, 'box', d[8] ? '#b3262e' : '#e0a020', .8, 1.0, .3, 0, 6.55, 1.2); pt(g, 'box', '#2a2622', .5, .6, .32, 0, 6.55, 1.24, 0, 0, .785);
+  for (let i = 0; i < 3; i++) pt(g, 'box', i % 2 ? P1 : P3, 5.2 - i * .5, .28, 1.0, 0, .14, 1.7 + i * .95);
+  bakeStatic(g);
+}
+
+/* ───────── FORT ─────────
+   Palissade de rondins ligaturés, portail à linteau et bannière, donjon de pierre crénelé sous un toit de guet.
+   Les drapeaux, le feu et la tente sont posés par gfx.js, comme avant. */
+function fortDecor(g, f, x, y, z) {
+  const c = FACTION[f[4]].c, B1 = '#6b4a2a', B2 = '#5a3c20', N = '#1a1210', S1 = '#7a7068', S2 = '#5f574f', S3 = '#8d837a';
+  for (let i = 0; i < 22; i++) { const a = i / 22 * 6.283; if (Math.abs(a - 1.571) < .42) continue; const px = Math.cos(a) * 12, pz = Math.sin(a) * 12, hy = height(x + px, z + pz) - y, k = 1 + (i % 3) * .06;
+    pt(g, 'cyl', i % 2 ? B1 : '#75522f', .6, 5.2 * k, .6, px, hy + 2.4 * k, pz); pt(g, 'cone', B2, .6, 1.1, .6, px, hy + 5.5 * k, pz); pt(g, 'cyl', '#3a2a1a', .64, .2, .64, px, hy + 3.7, pz); pt(g, 'cyl', '#3a2a1a', .64, .2, .64, px, hy + 1.3, pz); }
+  const gy = height(x, z + 11) - y;                                                                   // portail
+  for (const s of [1, -1]) { pt(g, 'cyl', B2, .78, 7, .78, s * 4.9, gy + 3.5, 10.95); pt(g, 'cone', '#3a2a1a', .78, 1.2, .78, s * 4.9, gy + 7.6, 10.95);
+    const t = new THREE.Mesh(GEO.cone, glow('#ff9a2b', 2.6)); t.scale.set(.3, .75, .3); t.position.set(s * 4.9, gy + 4.6, 11.95); g.add(t); SPIN.push({ m: t, fire: 1 }); pt(g, 'cyl', '#2a2622', .3, .25, .3, s * 4.9, gy + 4.05, 11.95); }
+  pt(g, 'box', B2, 11.2, .6, .8, 0, gy + 6.3, 10.95); pt(g, 'box', '#3a2a1a', 11.6, .2, .95, 0, gy + 6.7, 10.95); pt(g, 'box', c, 2.4, 2.2, .12, 0, gy + 4.9, 11.0); pt(g, 'box', shade(c, .7), 2.4, .3, .14, 0, gy + 3.9, 11.0);
+  for (let i = 0; i < 4; i++) for (const s of [1, -1]) { const sx = s * (7.5 + i * 1.3); pt(g, 'cyl', B1, .14, 2.6, .14, sx, height(x + sx, z + 14) - y + .9, 14, .7, 0, .5); pt(g, 'cyl', B1, .14, 2.6, .14, sx, height(x + sx, z + 14) - y + .9, 14, .7, 0, -.5); }   // chevaux de frise
+  // donjon de pierre
+  pt(g, 'box', S2, 5, .8, 5, 0, .4, -4); pt(g, 'box', S1, 4.4, 8, 4.4, 0, 4, -4);
+  for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) for (let k = 0; k < 5; k++) pt(g, 'box', k % 2 ? S3 : S2, .8, .7, .8, sx * 2.0, 1.1 + k * 1.6, -4 + sz * 2.0);
+  for (let k = 0; k < 3; k++) pt(g, 'box', S2, 4.5, .16, 4.5, 0, 2.6 + k * 2, -4);
+  pt(g, 'box', S2, 5.8, .6, 5.8, 0, 8.3, -4); for (let i = 0; i < 12; i++) { const e = i % 3, sd = (i / 3) | 0, o = (e - 1) * 2.1, px = sd === 0 ? o : sd === 1 ? 2.5 : sd === 2 ? o : -2.5, pz = sd === 0 ? 2.5 : sd === 1 ? o : sd === 2 ? -2.5 : o; pt(g, 'box', i % 2 ? S3 : S1, 1.0, .95, 1.0, px, 9.05, -4 + pz); }
+  for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) pt(g, 'cyl', B2, .2, 2.6, .2, sx * 1.9, 9.9, -4 + sz * 1.9);
+  pt(g, 'pyr', '#4a3a2a', 4.4, 2.4, 4.4, 0, 12.3, -4, 0, Math.PI / 4); pt(g, 'pyr', '#3a2c20', 4.9, .7, 4.9, 0, 11.3, -4, 0, Math.PI / 4);
+  pt(g, 'box', N, 1.5, 2.6, .2, 0, 1.7, -1.75); pt(g, 'box', B1, 1.2, 2.3, .16, -.2, 1.6, -1.6, 0, -.4); pt(g, 'box', S3, 2.1, .45, .4, 0, 3.15, -1.75); win(g, 0, 5.8, -1.75);
+  for (const s of [1, -1]) { pt(g, 'box', N, .2, 1.3, .35, s * 2.22, 5.4, -4); pt(g, 'box', N, .35, 1.3, .2, s * 1.1, 3.4 + (s > 0 ? 3.6 : 0), -1.78); }
+  // vie du camp
+  for (const [bx, bz] of [[5.6, -2.2], [6.6, -1.2]]) { pt(g, 'cyl', '#a8743c', .6, 1.3, .6, bx, .65, bz); for (const yy of [.3, 1]) pt(g, 'cyl', '#4a3a2a', .64, .1, .64, bx, yy, bz); }
+  pt(g, 'box', '#b98a52', 1.3, 1, 1.3, 6.2, .5, -3.6, 0, .3); pt(g, 'box', '#8a5a30', 1.34, .1, 1.34, 6.2, 1, -3.6, 0, .3);
+  for (const s of [1, -1]) pt(g, 'cyl', B2, .1, 2.2, .1, -6.2 + s * 1.2, 1.1, -3); pt(g, 'cyl', B2, .08, 2.8, .08, -6.2, 1.9, -3, 0, 0, Math.PI / 2); for (let i = 0; i < 3; i++) { pt(g, 'cyl', B1, .05, 3, .05, -7 + i * .8, 1.5, -2.8, .12); pt(g, 'cone', matMetal('#c8ccd4'), .12, .45, .12, -7 + i * .8, 3.1, -2.62, .12); }
+  bakeStatic(g);
+}
+
+/* ───────── INTÉRIEUR DES DONJONS ─────────
+   Le jeu construit la salle (et ses obstacles) ; on habille ensuite ce qui est là, sans rien déplacer :
+   sol dallé, pierre sur les murs et les rochers, piliers engagés le long des murs, éboulis au pied des parois. */
+const DJM = {};
+function donjonDeco() {
+  const len = DG.len, r = rng(hstr(DG.id) + 7);
+  for (const m of DGp.children.slice()) {
+    if (!m.isMesh) continue;
+    if (m.geometry.type === 'PlaneGeometry' && m.material.isMeshStandardMaterial) {
+      const mk = (n, c) => { const t = TEX(n, c).clone(); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(9, (len + 16) / 4.9); t.needsUpdate = true; return t; };
+      m.material = new THREE.MeshStandardMaterial({ color: m.material.color.clone().multiplyScalar(3.2), roughness: .92, map: mk('paves_c', 1), normalMap: mk('paves_n', 0) });
+    } else if (m.material.isMeshToonMaterial) { const k = m.material.color.getHexString(); let dm = DJM[k]; if (!dm) { dm = DJM[k] = decorMaterial('roche'); dm.color.copy(m.material.color).multiplyScalar(1.5); } m.material = dm; m.receiveShadow = true; }
+  }
+  const dk = Object.values(DJM)[0] || decorMaterial('roche'), P = (geo, sx, sy, sz, x, y, z, ry) => { const m = new THREE.Mesh(geo, dk); m.scale.set(sx, sy, sz); m.position.set(x, y, z); if (ry) m.rotation.y = ry; m.castShadow = m.receiveShadow = true; DGp.add(m); };
+  for (let z = 2; z > -len; z -= 9) for (const s of [-1, 1]) { P(GEO.box, 1.5, 9.4, 1.5, s * 20.1, 4.7, z); P(GEO.box, 2.0, .5, 2.0, s * 20.1, .25, z); P(GEO.box, 1.9, .5, 1.9, s * 20.1, 9.0, z); P(GEO.box, 1.1, .5, 2.6, s * 20.3, 7.6, z + 1.6, 0); P(GEO.box, 1.1, .5, 2.6, s * 20.3, 7.6, z - 1.6, 0); }
+  const roc = pg('dj_roc', () => bosse(soude(new THREE.IcosahedronGeometry(1, 2)), .16, 31));
+  for (let i = 0; i < len * .9; i++) { const s = r() < .5 ? -1 : 1, q = .25 + r() * .45; P(roc, q, q * .7, q, s * (19.3 + r() * .5), q * .3, 4 - r() * (len + 2), r() * 6); }
+}

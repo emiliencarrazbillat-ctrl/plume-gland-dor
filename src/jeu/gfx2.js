@@ -294,7 +294,7 @@ function rendu2Tick(dt, px, py, pz, tod, bi) {   // appelé à la fin de gfxTick
     _sd.copy(sun.position).sub(sun.target.position).normalize(); USUND.value.copy(_sd);
     USUNC.value.set(sun.color.r, sun.color.g, sun.color.b).multiplyScalar(lerp(.35, 1.25, dayF));
     const b = scene.background; UHOR.value.set(b.r, b.g, b.b); UZEN.value.set(b.r * lerp(.5, .42, dayF), b.g * lerp(.6, .62, dayF), b.b * lerp(.9, 1.02, dayF)); UNUIT.value = 1 - dayF;
-  } else { hemi.color.setRGB(1, 1, 1); UNUIT.value = 1; }
+  } else { hemi.color.setRGB(1, 1, 1); UNUIT.value = 1; if (DG && DGp.userData.deco !== DG && DGp.children.length) { DGp.userData.deco = DG; donjonDeco(); } }
   if (CIEL) { CIEL.position.copy(cam.position); CIEL.visible = area === 'world'; }
   const nage = area === 'world' && typeof P !== 'undefined' && P.g && !P.fly && height(px, pz) < -.05 ? 1 : 0;
   URIP.value.set(px, pz, 0, lerp(URIP.value.w, nage, Math.min(1, dt * 4)));
