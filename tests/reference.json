@@ -1,0 +1,19 @@
+{
+ "relief": "5a13ae23",
+ "praticable": "f425ae42",
+ "casesPraticables": 25323,
+ "biomes": "e3a039d9",
+ "obstacles": "268:4bb44b1f",
+ "quetes": 285,
+ "textesQuetes": "7ad7045d",
+ "pnj": 89,
+ "pnjPositions": "961d31c4",
+ "villages": "658b9822",
+ "forts": "838a2e54",
+ "donjons": "3f55f206",
+ "ennemis": "85327421",
+ "zonesEnnemis": 330,
+ "statsDepart": "{\"atk\":15,\"def\":1,\"hp\":114,\"mag\":8.5}",
+ "camera": "0,37,30",
+ "champ": 40
+}

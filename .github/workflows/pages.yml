@@ -1,0 +1,40 @@
+# Met le jeu en ligne (GitHub Pages) à chaque envoi sur la branche de refonte.
+# Le jeu d'origine (branche main) reste consultable à l'adresse …/origine/ pour comparer.
+name: Mise en ligne
+on:
+  push:
+    branches: [refonte-visuelle]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: _origine
+      - run: |
+          mkdir dist/origine
+          cp _origine/index.html _origine/*.js dist/origine/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deploiement
+        uses: actions/deploy-pages@v4
