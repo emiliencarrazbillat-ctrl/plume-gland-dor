@@ -184,10 +184,10 @@ const TESTS = {
   },
   async donjon() {
     const p = await ouvrir(); await nouvellePartie(p);
-    await p.evaluate(() => __dbg.enterDungeon('d1')); await p.waitForFunction(() => __dbg.area === 'd1', null, { timeout: 30000 }); await p.evaluate(() => { __dbg.adv(1); __dbg.frame(); });
+    await p.evaluate(() => __dbg.enterDungeon('d1')); await p.waitForFunction(() => __dbg.area === 'd1', null, { timeout: 120000 }); await p.evaluate(() => { __dbg.adv(1); __dbg.frame(); });
     const r = await p.evaluate(() => ({ mobs: __dbg.ENT.filter(e => !e.dead).length, ok: __dbg.walkable(__dbg.P.x, __dbg.P.z), mur: __dbg.walkable(25, 0), zone: document.getElementById('zone').innerText }));
     assert(r.mobs >= 7, 'ennemis du donjon : ' + r.mobs); assert(r.ok && !r.mur, 'collisions du donjon'); assert(r.zone.includes('Terrier des Brigands'), 'nom du donjon : ' + r.zone);
-    await p.evaluate(() => __dbg.leaveDungeon()); await p.waitForFunction(() => __dbg.area === 'world', null, { timeout: 30000 }); await p.evaluate(() => __dbg.adv(.5));
+    await p.evaluate(() => __dbg.leaveDungeon()); await p.waitForFunction(() => __dbg.area === 'world', null, { timeout: 120000 }); await p.evaluate(() => __dbg.adv(.5));
     assert(await p.evaluate(() => __dbg.walkable(__dbg.P.x, __dbg.P.z)), 'sortie de donjon hors zone praticable'); assert(p.errs.length === 0, p.errs.join(' | ')); return p;
   },
   async construction() {

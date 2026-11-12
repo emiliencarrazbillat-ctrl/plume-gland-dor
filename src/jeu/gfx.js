@@ -126,7 +126,7 @@ function mBulldog0(c,o={}){const g=new THREE.Group(),D='#1a1614',Wt='#e8e2d6',le
   if(o.king){pt(g,'cyl',matMetal('#ffd24a'),.62,.3,.62,0,2.92,1.7);for(let i=0;i<6;i++)pt(g,'cone',matMetal('#ffd24a'),.11,.42,.11,Math.cos(i*1.047)*.55,3.25,1.7+Math.sin(i*1.047)*.55);pt(g,'box','#6a0a0a',2.6,.12,3,0,2.05,-.6,-.12);pt(g,'sph',matMetal('#55585f'),1.28,.7,1.3,0,1.75,.2);const gr=new THREE.Mesh(GEO.ico,glow('#ffe9a0',3));gr.scale.setScalar(.3);gr.position.set(0,.75,1.85);g.add(gr);}
   Object.assign(g.userData,{tail});return g;}
 /* personnages : pièces fusionnées, contours sombres, gabarits réutilisés */
-const CHARMAT=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:GRAD}),TPL={};
+const CHARMAT=charMaterial(),TPL={};
 function outMat(c,k){const m=new THREE.MeshBasicMaterial({color:lin(c).multiplyScalar(k||1),side:THREE.BackSide,toneMapped:false});m.onBeforeCompile=s=>{s.vertexShader=s.vertexShader.replace('#include <project_vertex>','vec4 mvPosition=modelViewMatrix*vec4(transformed,1.0);mvPosition.xyz+=normalize(normalMatrix*normal)*.06;gl_Position=projectionMatrix*mvPosition;');};return m;}
 const OUTM=outMat('#2a1a12'),OUTT=outMat('#ffe45c',1.6),FLASHM=new THREE.MeshBasicMaterial({color:new THREE.Color(1.6,1.6,1.6),toneMapped:false});
 const _mi=new THREE.Matrix4(),_mr=new THREE.Matrix4();
@@ -135,20 +135,21 @@ function bakeChar(root){root.updateMatrixWorld(true);const sp=new Set();for(cons
   const unit=U=>{if(U.isMesh){if(!ok(U))return;U.userData={k:'c'};const o=new THREE.Mesh(U.geometry,OUTM);o.userData={k:'o'};U.add(o);return;}
     const ms=[],walk=n=>{for(const ch of n.children){if(sp.has(ch))continue;if(ch.isMesh){if(ok(ch))ms.push(ch);}else walk(ch);}};walk(U);if(!ms.length)return;
     _mi.copy(U.matrixWorld).invert();let n=0;const parts=ms.map(m=>{const q=m.geometry.index?m.geometry.toNonIndexed():m.geometry.clone();_mr.multiplyMatrices(_mi,m.matrixWorld);q.applyMatrix4(_mr);n+=q.attributes.position.count;return[q,m.material.color];});
-    const Pa=new Float32Array(n*3),Na=new Float32Array(n*3),Ca=new Float32Array(n*3);let o=0;for(const[q,c]of parts){const cnt=q.attributes.position.count;Pa.set(q.attributes.position.array,o*3);Na.set(q.attributes.normal.array,o*3);for(let i=0;i<cnt;i++){Ca[(o+i)*3]=c.r;Ca[(o+i)*3+1]=c.g;Ca[(o+i)*3+2]=c.b;}o+=cnt;q.dispose();}
+    const Pa=new Float32Array(n*3),Na=new Float32Array(n*3),Ca=new Float32Array(n*3);let o=0;for(const[q,c]of parts){const cnt=q.attributes.position.count;Pa.set(q.attributes.position.array,o*3);Na.set(q.attributes.normal.array,o*3);{const qc=q.attributes.color;for(let i=0;i<cnt;i++){const k=qc?qc.getX(i):1;Ca[(o+i)*3]=c.r*k;Ca[(o+i)*3+1]=c.g*k;Ca[(o+i)*3+2]=c.b*k;}}o+=cnt;q.dispose();}
     const G=new THREE.BufferGeometry();G.setAttribute('position',new THREE.BufferAttribute(Pa,3));G.setAttribute('normal',new THREE.BufferAttribute(Na,3));G.setAttribute('color',new THREE.BufferAttribute(Ca,3));ms.forEach(m=>m.parent.remove(m));
     const M=new THREE.Mesh(G,CHARMAT);M.castShadow=true;M.userData={k:'c'};U.add(M);const O=new THREE.Mesh(G,OUTM);O.userData={k:'o'};U.add(O);};
   unit(root);sp.forEach(unit);root.userData={};return root;}
 function charInst(type,c,o,build){const key=type+'|'+c+'|'+JSON.stringify(o);let t=TPL[key];if(!t)t=TPL[key]=bakeChar(build(c,o));const m=t.clone(true),u=m.userData={cols:[],outs:[]};
   m.traverse(n=>{if(n===m)return;if(n.name&&n.name.startsWith('sp_')){const p=n.name.slice(3).split('_');if(p.length>1)(u[p[0]]=u[p[0]]||[])[+p[1]]=n;else u[p[0]]=n;}const k=n.userData&&n.userData.k;if(k==='c'){n.userData={k,mat:n.material};u.cols.push(n);}else if(k==='o')u.outs.push(n);});return m;}
-const mGoose=(c,o={})=>charInst('go',c,o,mGoose0),mSquirrel=(c,o={})=>charInst('sq',c,o,mSquirrel0),mQuad=(c,o={})=>charInst('qd',c,o,mQuad0),mBulldog=(c,o={})=>charInst('bd',c,o,mBulldog0);
+/* les gabarits refaits sont dans perso.js (mGoose1…) ; les anciens (mGoose0…) ne servent plus */
+const mGoose=(c,o={})=>charInst('go',c,o,mGoose1),mSquirrel=(c,o={})=>charInst('sq',c,o,mSquirrel1),mQuad=(c,o={})=>charInst('qd',c,o,mQuad1),mBulldog=(c,o={})=>charInst('bd',c,o,mBulldog1);
 function flashChar(m,on){const u=m.userData;if(!u.cols||!!u.fl===!!on)return;u.fl=!!on;for(const c of u.cols)c.material=on?FLASHM:c.userData.mat;}
 function outChar(m,on){const u=m.userData;if(u.outs)for(const o of u.outs)o.material=on?OUTT:OUTM;}
 GEO.gab=(()=>{const A=[-.5,0,-.5],B=[-.5,0,.5],C=[-.5,1,0],D=[.5,0,-.5],E=[.5,0,.5],F=[.5,1,0],t=[A,B,C,D,F,E,B,E,F,B,F,C,A,C,F,A,F,D,A,D,E,A,E,B],q=new THREE.BufferGeometry();q.setAttribute('position',new THREE.BufferAttribute(new Float32Array(t.flat()),3));q.computeVertexNormals();return q;})();
 const STATM=decorMaterial('bati');
 function bakeStatic(root){root.updateMatrixWorld(true);const ms=[],walk=n=>{for(const ch of n.children){if(ch.userData.dyn)continue;if(ch.isMesh){if(ch.material.isMeshToonMaterial&&!ch.isInstancedMesh)ms.push(ch);}else walk(ch);}};walk(root);if(!ms.length)return root;
   _mi.copy(root.matrixWorld).invert();let n=0;const parts=ms.map(m=>{const q=m.geometry.index?m.geometry.toNonIndexed():m.geometry.clone();_mr.multiplyMatrices(_mi,m.matrixWorld);q.applyMatrix4(_mr);n+=q.attributes.position.count;return[q,m.material.color];});
-  const Pa=new Float32Array(n*3),Na=new Float32Array(n*3),Ca=new Float32Array(n*3);let o=0;for(const[q,c]of parts){const cnt=q.attributes.position.count;Pa.set(q.attributes.position.array,o*3);Na.set(q.attributes.normal.array,o*3);for(let i=0;i<cnt;i++){Ca[(o+i)*3]=c.r;Ca[(o+i)*3+1]=c.g;Ca[(o+i)*3+2]=c.b;}o+=cnt;q.dispose();}
+  const Pa=new Float32Array(n*3),Na=new Float32Array(n*3),Ca=new Float32Array(n*3);let o=0;for(const[q,c]of parts){const cnt=q.attributes.position.count;Pa.set(q.attributes.position.array,o*3);Na.set(q.attributes.normal.array,o*3);{const qc=q.attributes.color;for(let i=0;i<cnt;i++){const k=qc?qc.getX(i):1;Ca[(o+i)*3]=c.r*k;Ca[(o+i)*3+1]=c.g*k;Ca[(o+i)*3+2]=c.b*k;}}o+=cnt;q.dispose();}
   const G=new THREE.BufferGeometry();G.setAttribute('position',new THREE.BufferAttribute(Pa,3));G.setAttribute('normal',new THREE.BufferAttribute(Na,3));G.setAttribute('color',new THREE.BufferAttribute(Ca,3));ms.forEach(m=>m.parent.remove(m));
   const M=new THREE.Mesh(G,STATM);M.castShadow=M.receiveShadow=true;root.add(M);return root;}
 function mkModel(kind,bi){const T=ET[kind];const col=T.col||(T.m==='go'?FEA[bi]:FUR[bi]);return T.m==='bd'?mBulldog(col,T.o):T.m==='go'?mGoose(col,T.o):T.m==='sq'?mSquirrel(col,T.o):mQuad(col,T.o);}

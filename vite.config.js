@@ -5,7 +5,7 @@ import path from 'node:path';
 /* Le jeu est écrit en fichiers qui partagent un seul espace de noms et se chargent dans un ordre précis
    (sys2.js redéfinit des fonctions de game.js). Ce greffon les assemble dans cet ordre en un seul module,
    sans toucher à leur contenu : le comportement reste celui des anciennes balises <script>. */
-const ORDRE = ['data_old.js', 'data.js', 'data2.js', 'data3.js', 'gfx2.js', 'gfx.js', 'game.js', 'sys2.js', 'pnj_vie.js', 'boot.js'];
+const ORDRE = ['data_old.js', 'data.js', 'data2.js', 'data3.js', 'gfx2.js', 'gfx.js', 'game.js', 'sys2.js', 'perso.js', 'pnj_vie.js', 'boot.js'];
 const DOSSIER = path.resolve(import.meta.dirname, 'src/jeu');
 function jeu() {
   const ID = '\0virtual:jeu';

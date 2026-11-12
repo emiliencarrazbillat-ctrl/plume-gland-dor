@@ -29,6 +29,7 @@ npm run build
 | `index.html` | Page, styles, HUD, menus, écran titre |
 | `src/jeu/` | Le jeu : données (`data*.js`), rendu (`gfx.js`), moteur (`game.js`), systèmes (`sys2.js`), démarrage (`boot.js`). Ces fichiers partagent un seul espace de noms et sont assemblés dans cet ordre par `vite.config.js`. |
 | `src/jeu/gfx2.js` | Le nouveau rendu : eau à reflets, sol texturé, matières, ciel, post-traitement |
+| `src/jeu/perso.js` | Les personnages : formes des quatre gabarits (oie, écureuil, quadrupède, bulldog) et animation |
 | `src/jeu/pnj_vie.js` | Les villageois se promènent et rentrent chez eux (sans jamais bloquer une quête) |
 | `src/three-compat.js` | Pont vers Three.js récent (garde le rendu d'origine tant que l'éclairage n'est pas refait) |
 | `src/outils/` | Outils de mise au point (compteur de fluidité) |

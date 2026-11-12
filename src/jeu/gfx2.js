@@ -225,6 +225,16 @@ function decorMaterial(genre) {   // genre : 'bati' | 'feuillage' | 'tronc' | 'r
   return m;
 }
 
+/* ───────── MATIÈRE DES PERSONNAGES ─────────
+   Rendu « dessin animé » : trois tons aux transitions douces, un liseré de lumière sur le bord, contour sombre (gfx.js). */
+function charMaterial() {
+  const N = 64, d = new Uint8Array(N * 4); for (let i = 0; i < N; i++) { const x = i / (N - 1), v = .46 + .3 * sstep(.3, .4, x) + .24 * sstep(.62, .74, x); d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v * 255; d[i * 4 + 3] = 255; }
+  const gr = new THREE.DataTexture(d, N, 1, THREE.RGBAFormat); gr.minFilter = gr.magFilter = THREE.LinearFilter; gr.needsUpdate = true;
+  const m = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: gr });
+  m.onBeforeCompile = s => { s.fragmentShader = s.fragmentShader.replace('#include <opaque_fragment>', 'float rimP=pow(1.-clamp(dot(normalize(vViewPosition),normal),0.,1.),3.);outgoingLight+=diffuseColor.rgb*rimP*.42;\n#include <opaque_fragment>'); };
+  return m;
+}
+
 /* ───────── VÉGÉTATION ─────────
    Mêmes emplacements et mêmes couleurs qu'avant (listes fabriquées par buildDecor), formes plus fournies,
    et découpage en cases pour ne dessiner que ce qui est à l'écran. */

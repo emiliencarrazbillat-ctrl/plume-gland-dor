@@ -29,4 +29,4 @@ Toutes viennent de Poly Haven (https://polyhaven.com), licence CC0 (domaine publ
 
 ## Modèles 3D, sons
 
-Aucune ressource externe : les formes (maisons, arbres, personnages) sont fabriquées par le code du jeu, les vaguelettes de l'eau et le ciel sont calculés.
+Aucune ressource externe : les formes (maisons, arbres) sont fabriquées par le code du jeu, et les personnages (oies, écureuils, loutres, renards, sangliers, blaireaux, bulldogs) sont modelés par nous dans `src/jeu/perso.js`, les vaguelettes de l'eau et le ciel sont calculés.
