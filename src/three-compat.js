@@ -2,6 +2,8 @@
    Étape 1 « fondations » : on garde exactement l'ancien rendu. Ces réglages d'héritage seront retirés
    au fur et à mesure que l'éclairage et les matières seront refaits (étape 2 et suivantes). */
 import * as T from 'three';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
 // 1. Couleurs : le jeu convertit lui-même ses couleurs (fonction lin()), comme avant r152.
 T.ColorManagement.enabled = false;
@@ -18,9 +20,10 @@ remplace('lights_physical_pars_fragment', /reflectedLight\.directSpecular \+= ir
 remplace('lights_physical_pars_fragment', /reflectedLight\.directDiffuse \+= irradiance \* diffuseBRDF \* \( 1\.0 - F \);/, 'reflectedLight.directDiffuse += irradiance * diffuseBRDF;');
 remplace('lights_physical_pars_fragment', /vec3 diffuse = irradiance \* BRDF_Lambert\( material\.diffuseContribution \) \* \( 1\.0 - singleScattering - multiScattering \);/, 'vec3 diffuse = irradiance * BRDF_Lambert( material.diffuseContribution );');
 
-// 3. Post-traitement : dans le jeu d'origine il ne s'activait jamais (le code cherchait THREE.Pass.FullScreenQuad,
-//    que post.js ne fournissait pas sous ce nom). On garde donc exactement ce que les joueurs voyaient : pas de post-traitement.
-//    Halo, occlusion ambiante et étalonnage seront refaits proprement à l'étape 2.
+// 3. Courbe de rendu des hautes lumières (« tone mapping ») : fidèle dans les tons moyens, douce dans les clairs.
+//    La même courbe est utilisée par le post-traitement (gfx2.js) et, en qualité basse, directement par les matières.
+remplace('tonemapping_pars_fragment', /vec3 CustomToneMapping\( vec3 color \) \{ return color; \}/,
+  'vec3 CustomToneMapping( vec3 color ) {\n\tcolor = max( color * toneMappingExposure, 0.0 );\n\tvec3 t = max( color - 0.55, 0.0 ) / 0.45;\n\treturn mix( color, 0.55 + 0.45 * ( 1.0 - exp( - t ) ), step( 0.55, color ) );\n}');
 
-export const THREE = Object.assign({}, T);
+export const THREE = Object.assign({}, T, { FullScreenQuad, UnrealBloomPass });
 window.THREE = THREE;

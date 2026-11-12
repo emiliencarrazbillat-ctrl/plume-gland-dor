@@ -10,6 +10,23 @@ Chaque ressource utilisée par le jeu est notée ici avec sa source et sa licenc
 | Vite 8 | Outil de construction (non livré avec le jeu) | https://vite.dev | MIT |
 | Playwright | Tests automatiques (non livré avec le jeu) | https://playwright.dev | Apache 2.0 |
 
-## Modèles 3D, textures, sons
+## Textures
 
-Aucune ressource externe pour l'instant : tout le visuel est encore fabriqué par le code du jeu d'origine.
+Toutes viennent de Poly Haven (https://polyhaven.com), licence CC0 (domaine public, usage commercial libre, sans attribution obligatoire). Résolution d'origine 1K, converties en WebP dans `src/assets/tex/` (`_c` = couleur, `_n` = relief).
+
+| Fichier | Texture d'origine | Usage |
+|---|---|---|
+| `herbe_c.webp`, `herbe_n.webp` | [leafy_grass](https://polyhaven.com/a/leafy_grass) | Sol : herbe |
+| `sable_c.webp`, `sable_n.webp` | [coast_sand_01](https://polyhaven.com/a/coast_sand_01) | Sol : sable des rives et chemins |
+| `terre_c.webp`, `terre_n.webp` | [stony_dirt_path](https://polyhaven.com/a/stony_dirt_path) | Sol : chemins |
+| `roche_c.webp`, `roche_n.webp` | [aerial_rocks_02](https://polyhaven.com/a/aerial_rocks_02) | Sol : pentes rocheuses, rochers |
+| `neige_c.webp`, `neige_n.webp` | [snow_02](https://polyhaven.com/a/snow_02) | Réservée aux Monts Givrés (pas encore utilisée) |
+| `sousbois_c.webp`, `sousbois_n.webp` | [forest_floor](https://polyhaven.com/a/forest_floor) | Réservée au Bois Roux (pas encore utilisée) |
+| `tuiles_c.webp`, `tuiles_n.webp` | [clay_roof_tiles_02](https://polyhaven.com/a/clay_roof_tiles_02) | Toits |
+| `crepi_c.webp`, `crepi_n.webp` | [painted_plaster_wall](https://polyhaven.com/a/painted_plaster_wall) | Murs |
+| `bois_c.webp`, `bois_n.webp` | [wood_planks](https://polyhaven.com/a/wood_planks) | Colombages, pontons, troncs |
+| `paves_c.webp`, `paves_n.webp` | [cobblestone_floor_04](https://polyhaven.com/a/cobblestone_floor_04) | Réservée aux places de village (pas encore utilisée) |
+
+## Modèles 3D, sons
+
+Aucune ressource externe : les formes (maisons, arbres, personnages) sont fabriquées par le code du jeu, les vaguelettes de l'eau et le ciel sont calculés.
