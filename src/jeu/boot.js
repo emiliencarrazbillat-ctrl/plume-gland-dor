@@ -1,5 +1,5 @@
 'use strict';
-buildWorld();buildExtras();buildPlayer();buildNPCs();pnjVieInit();buildSpawns();buildSpellBar();buildSecretsAndPuzzles();
+buildWorld();buildExtras();buildPlayer();buildNPCs();pnjVieInit();buildSpawns();buildSpellBar();buildSecretsAndPuzzles();efxInit();
 $('bNew').onclick=()=>{sfx(660,.1,'triangle',.06);renderSlots('new');};$('bCont').onclick=()=>{sfx(660,.1,'triangle',.06);renderSlots('cont');};
 $('bFree').onclick=()=>{$('end').style.display='none';state='play';};
 if(anySave())$('bCont').style.display='';$('title').style.display='flex';P.g.visible=true;P.g.position.set(-1,height(-1,59),59);

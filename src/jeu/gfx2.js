@@ -110,7 +110,9 @@ function buildCiel() {
 }
 
 /* ───────── EAU ───────── */
-const URIP = { value: new THREE.Vector4(0, 0, 0, 0) };
+const URIP = { value: new THREE.Vector4(0, 0, 0, 0) }, UFORME = { value: 0 };
+/* forme des particules par biome : 0 poussière, 1 pétale ou feuille, 2 flocon, 3 braise, 4 luciole */
+const FORMES = BIO.map(b => { const n = (b.n || '').toLowerCase(); return /givr|molosse/.test(n) ? 2 : /cendre|volcan/.test(n) ? 3 : /marais/.test(n) ? 4 : /cancan|gland|roux/.test(n) ? 1 : 0; });
 function eauMaterial() {
   return new THREE.ShaderMaterial({ transparent: true, depthWrite: false,
     uniforms: { uT: UT, uH: { value: HT }, uW: { value: WT }, uCl: { value: CT }, uFog: { value: scene.fog.color }, uLight: ULIGHT, uSun: USUN, uFn: UFN, uFf: UFF, uN: { value: texVagues() }, uRef: MIR.tex, uTM: { value: MIR.tm }, uRefOn: MIR.on, uSunD: USUND, uSunC: USUNC, uHor: UHOR, uZen: UZEN, uRip: URIP },
@@ -285,6 +287,15 @@ function rendu2Init() {   // appelé à la fin de buildWorld
   WATER.material.dispose(); WATER.material = eauMaterial();
   buildCiel();
   SANSREFLET.push(WATER, GRASS, RAIN, AMBI);
+  // particules d'ambiance : même nuage de points, mais une forme par biome (pétales, feuilles, flocons, braises, lucioles)
+  { const u = AMBI.material.uniforms; u.uForme = UFORME; AMBI.material = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: u,
+      vertexShader: 'uniform vec3 uP,uVel;uniform float uT,uSize,uForme;varying float vA,vR;void main(){vR=fract(position.x*7.31+position.z*3.7);vec3 p=position+uVel*uT;p.xz=mod(p.xz-uP.xz+35.,70.)-35.+uP.xz;p.y=mod(p.y,22.)+uP.y+.4;p.x+=sin(uT*1.3+position.z)*(.7+step(.5,uForme)*step(uForme,1.5)*1.2);p.z+=cos(uT*1.1+position.x)*step(.5,uForme)*step(uForme,1.5)*.9;vec4 mv=viewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=uSize*(70./-mv.z)*(.6+fract(position.x*7.))*(1.+step(.5,uForme)*step(uForme,1.5)*.9)*' + (Math.min(window.devicePixelRatio || 1, 2)).toFixed(2) + ';vA=.5+.5*sin(uT*3.+position.y*9.);}',
+      fragmentShader: `uniform vec3 uCol;uniform float uA,uForme,uT;varying float vA,vR;
+       void main(){vec2 q=gl_PointCoord-.5;float feuille=step(.5,uForme)*step(uForme,1.5);float a=vR*6.283+uT*(1.+vR*2.5)*feuille;q=mat2(cos(a),-sin(a),sin(a),cos(a))*q;
+        float d=length(q*vec2(1.,1.+feuille*(1.4+sin(uT*3.+vR*9.)*.9)));if(d>.5)discard;
+        float al=smoothstep(.5,mix(.1,.4,feuille),d);vec3 c=uCol*(.82+.36*vR);
+        float feu=step(2.5,uForme);c*=1.+feu*2.6*smoothstep(.32,.0,d);al*=mix(1.,.3+.7*vA*vA,step(3.5,uForme));
+        gl_FragColor=vec4(c,uA*al*mix(.55,1.,vA));}` }); }
 }
 const _sd = new THREE.Vector3();
 function rendu2Tick(dt, px, py, pz, tod, bi) {   // appelé à la fin de gfxTick : lumière, ciel, eau
@@ -296,6 +307,7 @@ function rendu2Tick(dt, px, py, pz, tod, bi) {   // appelé à la fin de gfxTick
     const b = scene.background; UHOR.value.set(b.r, b.g, b.b); UZEN.value.set(b.r * lerp(.5, .42, dayF), b.g * lerp(.6, .62, dayF), b.b * lerp(.9, 1.02, dayF)); UNUIT.value = 1 - dayF;
   } else { hemi.color.setRGB(1, 1, 1); UNUIT.value = 1; if (DG && DGp.userData.deco !== DG && DGp.children.length) { DGp.userData.deco = DG; donjonDeco(); } }
   if (CIEL) { CIEL.position.copy(cam.position); CIEL.visible = area === 'world'; }
+  if (area === 'world') UFORME.value = FORMES[bi] || 0;
   const nage = area === 'world' && typeof P !== 'undefined' && P.g && !P.fly && height(px, pz) < -.05 ? 1 : 0;
   URIP.value.set(px, pz, 0, lerp(URIP.value.w, nage, Math.min(1, dt * 4)));
 }

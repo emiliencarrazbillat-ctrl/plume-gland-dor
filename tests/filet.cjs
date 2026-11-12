@@ -157,12 +157,13 @@ const TESTS = {
   },
   async sort() {
     const p = await ouvrir(); await nouvellePartie(p); await queteM1Debut(p);
-    const e0 = (await brigands(p))[0]; await p.evaluate(e => { __dbg.S.sp[0] = 1; __dbg.P.x = e.x; __dbg.P.z = e.z + 5; __dbg.P.ang = Math.PI; __dbg.adv(.05); }, e0);
-    const somme = () => p.evaluate(() => ({ mp: __dbg.S.mp, hp: __dbg.ENT.filter(e => !e.dead && e.kind === 'brigand' && Math.hypot(e.x - 20, e.z - 5) < 25).reduce((s, e) => s + Math.max(0, e.hp), 0) }));
-    const a = await somme();
+    // on suit un brigand précis (d'autres peuvent passer dans les parages)
+    const a = await p.evaluate(() => { const d = __dbg, e = d.ENT.filter(e => !e.dead && e.hp > 0 && e.kind === 'brigand' && Math.hypot(e.x - 20, e.z - 5) < 25)[0]; window.__cible = e; d.S.sp[0] = 1; d.P.x = e.x; d.P.z = e.z + 5; d.P.ang = Math.PI; d.adv(.05); return { mp: d.S.mp, hp: e.hp }; });
     await p.keyboard.press('Digit1'); await p.evaluate(() => __dbg.adv(1.5));
-    const b = await somme();
-    assert(b.mp < a.mp - 20, `le sort ne coûte pas de magie : ${a.mp} → ${b.mp}`); assert(b.hp < a.hp, `le sort ne blesse pas : ${a.hp} → ${b.hp}`); return p;
+    const b = await p.evaluate(() => ({ mp: __dbg.S.mp, hp: __cible.dead ? 0 : Math.max(0, __cible.hp) }));
+    assert(b.mp < a.mp - 20, `le sort ne coûte pas de magie : ${a.mp} → ${b.mp}`); assert(b.hp < a.hp, `le sort ne blesse pas : ${a.hp} → ${b.hp}`);
+    // même coût qu'à l'origine pour le sort de feu
+    assert(a.mp - b.mp > 30 && a.mp - b.mp <= 35, 'coût du sort de feu : ' + (a.mp - b.mp).toFixed(1));   // 35, moins la magie régénérée entre-temps assert(p.errs.length === 0, p.errs.join(' | ')); return p;
   },
   async nage() {
     const p = await ouvrir(); await nouvellePartie(p);
