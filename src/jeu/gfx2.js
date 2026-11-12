@@ -154,12 +154,19 @@ function eauMaterial() {
 }
 
 /* ───────── SOL ───────── */
+/* poids des biomes à matière particulière, par sommet : neige, bois d'automne, terres arides */
+function solBiomes(geo) {
+  const p = geo.attributes.position, a = new Float32Array(p.count * 3), nom = BIO.map(b => (b.n || '').toLowerCase());
+  const iN = nom.findIndex(n => n.includes('givr')), iA = nom.findIndex(n => n.includes('roux')), ar = nom.map((n, i) => /cendre|volcan|molosse|pics/.test(n) ? i : -1).filter(i => i >= 0);
+  for (let i = 0; i < p.count; i++) { blend(p.getX(i), p.getZ(i)); a[i * 3] = iN >= 0 ? BW[iN] : 0; a[i * 3 + 1] = iA >= 0 ? BW[iA] : 0; let s = 0; for (const k of ar) s += BW[k]; a[i * 3 + 2] = s; }
+  geo.setAttribute('aBio', new THREE.BufferAttribute(a, 3));
+}
 function solMaterial() {
   const tm = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .95, metalness: 0 });
   tm.onBeforeCompile = s => {
-    Object.assign(s.uniforms, { uCl: { value: CT }, uRd: { value: RDT }, uT: UT, uTexOn: UTEX, tG: { value: TEX('herbe_c', 1) }, tGn: { value: TEX('herbe_n') }, tS: { value: TEX('sable_c', 1) }, tSn: { value: TEX('sable_n') }, tD: { value: TEX('terre_c', 1) }, tDn: { value: TEX('terre_n') }, tR: { value: TEX('roche_c', 1) }, tRn: { value: TEX('roche_n') } });
-    s.vertexShader = 'varying vec2 vWp;varying float vWy;varying vec3 vNw;\n' + s.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWp=transformed.xz;vWy=transformed.y;vNw=normal;');
-    s.fragmentShader = 'uniform sampler2D uCl,uRd,tG,tGn,tS,tSn,tD,tDn,tR,tRn;uniform float uT,uTexOn;varying vec2 vWp;varying float vWy;varying vec3 vNw;\n' + s.fragmentShader
+    Object.assign(s.uniforms, { uCl: { value: CT }, uRd: { value: RDT }, uT: UT, uTexOn: UTEX, tG: { value: TEX('herbe_c', 1) }, tGn: { value: TEX('herbe_n') }, tS: { value: TEX('sable_c', 1) }, tSn: { value: TEX('sable_n') }, tD: { value: TEX('terre_c', 1) }, tDn: { value: TEX('terre_n') }, tR: { value: TEX('roche_c', 1) }, tRn: { value: TEX('roche_n') }, tN: { value: TEX('neige_c', 1) }, tF: { value: TEX('sousbois_c', 1) } });
+    s.vertexShader = 'attribute vec3 aBio;varying vec2 vWp;varying float vWy;varying vec3 vNw,vBio;\n' + s.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWp=transformed.xz;vWy=transformed.y;vNw=normal;vBio=aBio;');
+    s.fragmentShader = 'uniform sampler2D uCl,uRd,tG,tGn,tS,tSn,tD,tDn,tR,tRn,tN,tF;uniform float uT,uTexOn;varying vec2 vWp;varying float vWy;varying vec3 vNw,vBio;\n' + s.fragmentShader
       .replace('#include <map_fragment>', `#include <map_fragment>
   float p1=texture2D(uCl,vWp*.011).r,p2=texture2D(uCl,vWp*.029+.31).r,p3=texture2D(uCl,vWp*.0045+.6).r;vec3 bs=diffuseColor.rgb;
   bs*=mix(.86,1.,smoothstep(.45,.6,p1));bs=mix(bs,bs*1.12+.01,smoothstep(.66,.76,p2));bs*=mix(.9,1.06,smoothstep(.35,.65,p3));
@@ -172,14 +179,18 @@ function solMaterial() {
   vec3 dS=mix(texture2D(tS,ua*.8).rgb,texture2D(tS,ub).rgb,.4)/${MOY.sable};
   vec3 dD=texture2D(tD,ua*1.2).rgb/${MOY.terre};
   vec3 dK=mix(texture2D(tR,ua*.55).rgb,texture2D(tR,ub*1.3).rgb,.4)/${MOY.roche};
+  float bN=smoothstep(.25,.7,vBio.x),bA=smoothstep(.25,.7,vBio.y),bR=smoothstep(.25,.7,vBio.z);
+  vec3 dN=mix(texture2D(tN,ua*.7).rgb,texture2D(tN,ub).rgb,.4)/vec3(.380,.378,.389);
+  vec3 dF=mix(texture2D(tF,ua*.9).rgb,texture2D(tF,ub*1.2).rgb,.35)/vec3(.368,.224,.102);
+  dG=mix(dG,dN,bN);dG=mix(dG,dF*vec3(1.08,.96,.9),bA);dG=mix(dG,mix(dK,dD,.35),bR);
   vec3 det=mix(dG,dS,mS);det=mix(det,dK,mK);det=mix(det,mix(dS,dD,.3),mR);
-  det=mix(vec3(dot(det,vec3(.3333))),det,.55);det=mix(vec3(1.),clamp(det,.4,1.8),uTexOn);
+  det=mix(vec3(dot(det,vec3(.3333))),det,.55+.3*bA);det=mix(vec3(1.),clamp(det,.4,1.8),uTexOn);
   vec3 pth=vec3(.70,.52,.27)*(.92+.1*p2);bs=mix(bs,pth,mR);bs=mix(bs,bs*.62,(1.-smoothstep(.0,.5,abs(rdd-2.8)))*.6);
   bs*=mix(.74,1.,smoothstep(.02,.42,vWy)+step(vWy,-.2));              // sable mouillé au bord de l'eau
   diffuseColor.rgb=bs*det*vec3(.80,.84,.74)*mix(.8,1.,texture2D(uCl,vWp*.0035+uT*.004).r);`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
   {vec3 nG=texture2D(tGn,ua).xyz*2.-1.,nS=texture2D(tSn,ua*.8).xyz*2.-1.,nD=texture2D(tDn,ua*1.2).xyz*2.-1.,nK=texture2D(tRn,ua*.55).xyz*2.-1.;
-   vec3 nm=mix(nG,nS,mS);nm=mix(nm,nK*1.5,mK);nm=mix(nm,mix(nS,nD,.3),mR);
+   vec3 nm=mix(nG,nS,mS);nm=mix(nm,nS*.5,bN*(1.-mS));nm=mix(nm,nK,bR*(1.-mS));nm=mix(nm,nK*1.5,mK);nm=mix(nm,mix(nS,nD,.3),mR);
    vec3 nW=normalize(vNw+vec3(nm.x,0.,-nm.y)*.6*uTexOn);normal=normalize((viewMatrix*vec4(nW,0.)).xyz);}`);
   };
   return tm;

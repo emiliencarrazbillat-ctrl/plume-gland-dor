@@ -46,8 +46,8 @@ async function nouvellePartie(p, slot = 1) {
   assert(await p.evaluate(() => __dbg.S.intro === 1), "l'introduction ne se termine pas");
 }
 const placer = (p, x, z) => p.evaluate(([x, z]) => { __dbg.P.x = x; __dbg.P.z = z; __dbg.adv(.2); }, [x, z]);
-async function parlerA(p, id) {
-  await p.evaluate(id => { const n = __dbg.NPCS.find(n => n.id === id); __dbg.P.x = n.x; __dbg.P.z = n.z + 3; __dbg.adv(.3); }, id);
+async function parlerA(p, id, d = 3) {
+  await p.evaluate(([id, d]) => { const n = __dbg.NPCS.find(n => n.id === id); __dbg.P.x = n.x; __dbg.P.z = n.z + d; __dbg.adv(.3); }, [id, d]);
   await p.keyboard.press('Space'); await p.waitForFunction(() => !!__dbg.DLG, null, { timeout: 20000 });
 }
 async function queteM1Debut(p) { await parlerA(p, 'cacarde'); await passerDialogues(p); await p.waitForFunction(() => __dbg.S.q && __dbg.S.q.id === 'm1', null, { timeout: 20000 }); await placer(p, 20, 11); await p.evaluate(() => __dbg.adv(1)); }
@@ -232,7 +232,7 @@ const TESTS = {
     assert(a.n >= 60, 'villageois suivis : ' + a.n); assert(a.bouges >= 4, 'presque personne ne bouge : ' + a.bouges); assert(a.maxEcart <= 4.6, 'un villageois s\'éloigne trop : ' + a.maxEcart.toFixed(1));
     assert(a.horsSol === 0, 'un villageois traverse un obstacle'); assert(a.coince < 60, 'un villageois reste coincé loin de sa place'); assert(a.marqueDedans === 0, 'un donneur de quête est rentré chez lui'); assert(a.cacarde !== 'dedans' && a.cacarde !== 'entre', 'la Doyenne (quête principale) est rentrée');
     // on peut toujours parler au donneur de la quête principale et lancer la quête
-    await parlerA(p, 'cacarde'); await passerDialogues(p); await p.waitForFunction(() => __dbg.S.q && __dbg.S.q.id === 'm1', null, { timeout: 20000 });
+    await parlerA(p, 'cacarde', 2.3); await passerDialogues(p); await p.waitForFunction(() => __dbg.S.q && __dbg.S.q.id === 'm1', null, { timeout: 60000 });   // tout près d'elle : un promeneur ne peut pas s'intercaler
     // de nuit : certains rentrent ; en approchant de la porte, le villageois ressort et on peut lui parler
     const b = await p.evaluate(() => { const d = __dbg; d.P.x = -30; d.P.z = 70; for (let i = 0; i < 200; i++) { d.S.time = 408; d.adv(.5); } const L = d.PNJV.liste.filter(n => n.vie.etat === 'dedans' && Math.hypot(n.hx, n.hz - 40) < 40); return { dedans: L.length, id: L[0] && L[0].id, visible: L[0] && L[0].g.visible }; });
     assert(b.dedans >= 1, 'personne ne rentre chez soi la nuit'); assert(b.visible === false, 'villageois rentré mais encore visible');

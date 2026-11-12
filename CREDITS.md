@@ -20,8 +20,8 @@ Toutes viennent de Poly Haven (https://polyhaven.com), licence CC0 (domaine publ
 | `sable_c.webp`, `sable_n.webp` | [coast_sand_01](https://polyhaven.com/a/coast_sand_01) | Sol : sable des rives et chemins |
 | `terre_c.webp`, `terre_n.webp` | [stony_dirt_path](https://polyhaven.com/a/stony_dirt_path) | Sol : chemins |
 | `roche_c.webp`, `roche_n.webp` | [aerial_rocks_02](https://polyhaven.com/a/aerial_rocks_02) | Sol : pentes rocheuses, rochers |
-| `neige_c.webp`, `neige_n.webp` | [snow_02](https://polyhaven.com/a/snow_02) | Réservée aux Monts Givrés (pas encore utilisée) |
-| `sousbois_c.webp`, `sousbois_n.webp` | [forest_floor](https://polyhaven.com/a/forest_floor) | Réservée au Bois Roux (pas encore utilisée) |
+| `neige_c.webp`, `neige_n.webp` | [snow_02](https://polyhaven.com/a/snow_02) | Sol : Monts Givrés |
+| `sousbois_c.webp`, `sousbois_n.webp` | [forest_floor](https://polyhaven.com/a/forest_floor) | Sol : Bois Roux |
 | `tuiles_c.webp`, `tuiles_n.webp` | [clay_roof_tiles_02](https://polyhaven.com/a/clay_roof_tiles_02) | Toits |
 | `crepi_c.webp`, `crepi_n.webp` | [painted_plaster_wall](https://polyhaven.com/a/painted_plaster_wall) | Murs |
 | `bois_c.webp`, `bois_n.webp` | [wood_planks](https://polyhaven.com/a/wood_planks) | Colombages, pontons, troncs |

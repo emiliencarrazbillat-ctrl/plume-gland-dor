@@ -178,7 +178,7 @@ function buildTerrain(){
   const dt=new THREE.CanvasTexture(dc);dt.wrapS=dt.wrapT=THREE.RepeatWrapping;dt.repeat.set(180,180);dt.colorSpace=THREE.SRGBColorSpace;
   const cc=document.createElement('canvas');cc.width=cc.height=256;const cx=cc.getContext('2d'),cr=rng(19);cx.fillStyle='#fff';cx.fillRect(0,0,256,256);for(let i=0;i<34;i++){const x=cr()*256,y=cr()*256,rr=22+cr()*46;for(const ox of[-256,0,256])for(const oy of[-256,0,256]){const gd=cx.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,rr);gd.addColorStop(0,'rgba(0,0,0,.5)');gd.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gd;cx.fillRect(x+ox-rr,y+oy-rr,rr*2,rr*2);}}
   CT=new THREE.CanvasTexture(cc);CT.wrapS=CT.wrapT=THREE.RepeatWrapping;
-  const tm=solMaterial();
+  solBiomes(geo);const tm=solMaterial();
   const terr=new THREE.Mesh(geo,tm);terr.receiveShadow=true;W.add(terr);
   // eau
   WATER=new THREE.Mesh(new THREE.PlaneGeometry(3200,3200),new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uT:UT,uH:{value:HT},uW:{value:WT},uCl:{value:CT},uFog:{value:scene.fog.color},uLight:ULIGHT,uSun:USUN,uFn:UFN,uFf:UFF},

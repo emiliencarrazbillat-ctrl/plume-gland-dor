@@ -145,26 +145,30 @@ function mQuad1(c, o = {}) {
   Object.assign(g.userData, { legs, tail, eyes }); return g;
 }
 
-/* ───────── BULLDOG (les Molosses) ───────── */
+/* ───────── BULLDOG (les Molosses) ─────────
+   Trapu, poitrail large et hanches étroites, face écrasée, bajoues pendantes, mâchoire du bas en avant, pattes arquées. */
 function mBulldog1(c, o = {}) {
-  const g = new THREE.Group(), D = '#1a1614', Wt = '#e8e2d6', l = o.lean ? .8 : 1, cle = o.lean ? 'm' : 'g';
-  pm(g, pg('bd_corps' + cle, () => volume([[0, 1.42, -1.82, .05, .05], [0, 1.36, -1.5, .78 * l, .74], [0, 1.22, -.7, 1.12 * l, 1.0], [0, 1.3, .25, 1.34 * l, 1.18], [0, 1.44, .95, 1.28 * l, 1.14], [0, 1.66, 1.5, .78, .78]], { sous: .22, rad: 18 })), c);
-  pm(g, pg('bd_poitrail' + cle, () => volume([[0, 1.5, 1.6, .04, .04], [0, 1.05, 1.42, .66 * l, .4], [0, .7, .8, .7 * l, .3], [0, .62, 0, .5 * l, .2], [0, .64, -.5, .04, .04]], { rad: 12 })), Wt);
-  pm(g, pg('bd_tete', () => volume([[0, 1.9, 1.0, .05, .05], [0, 2.0, 1.3, .9, .84], [0, 1.98, 1.75, 1.04, .93], [0, 1.86, 2.2, .9, .7], [0, 1.76, 2.55, .66, .48], [0, 1.74, 2.72, .1, .1]], { sous: .15, rad: 18 })), c);
-  pm(g, pg('bd_museau', () => volume([[0, 1.74, 2.3, .05, .05], [0, 1.72, 2.5, .62, .44], [0, 1.72, 2.8, .5, .36], [0, 1.74, 2.96, .08, .08]], { rad: 14 })), D);
-  pt(g, 'sph', '#0a0808', .17, .13, .1, 0, 1.88, 2.96);
-  for (const s of [1, -1]) { pt(g, 'sph', c, .48, .52, .5, s * .5, 1.5, 2.35); pt(g, 'cone', '#f6f1e4', .11, .36, .11, s * .32, 1.42, 2.72);
-    pt(g, 'sph', glow('#ff1a0a', 3.2), .12, .1, .08, s * .4, 2.18, 2.52); pt(g, 'box', D, .5, .14, .2, s * .4, 2.36, 2.45, 0, 0, s * -.35);
-    pm(g, pg('qd_oreille', () => plaque(OREILLE_P, .09)), c, s * .78, 2.62, 1.45, .2, 0, s * -1.05, 1.5); }
-  pt(g, 'box', D, .95, .2, .62, 0, 1.2, 2.42);
-  const legs = []; for (const [x, z, av] of [[.85, .9, 1], [-.85, .9, 1], [.75, -1.1, 0], [-.75, -1.1, 0]]) { const L = grp(g, x * l, 1.0, z);
-    pm(L, pg('bd_patte', () => volume([[0, .15, 0, .05, .05], [0, 0, 0, .36, .38], [0, -.5, .02, .28, .29], [0, -.82, .04, .3, .34], [0, -.98, .1, .05, .05]], { rad: 12 })), c, 0, 0, 0, 0, 0, 0, av ? 1 : .9);
-    pt(L, 'sph', Wt, av ? .34 : .3, .16, av ? .4 : .36, 0, -.9, .1); legs.push(L); }
+  const g = new THREE.Group(), D = '#1a1614', Wt = '#e8e2d6', l = o.lean ? .8 : 1, cle = o.lean ? 'm' : 'g', Cs = shade(c, .78);
+  pm(g, pg('bd_corps' + cle, () => volume([[0, 1.46, -1.8, .05, .05], [0, 1.42, -1.52, .62 * l, .62], [0, 1.3, -.8, .92 * l, .86], [0, 1.26, .1, 1.3 * l, 1.12], [0, 1.4, .9, 1.42 * l, 1.2], [0, 1.66, 1.5, .86, .82]], { sous: .22, rad: 18 })), c);
+  pm(g, pg('bd_poitrail' + cle, () => volume([[0, 1.5, 1.62, .04, .04], [0, 1.02, 1.46, .78 * l, .42], [0, .66, .8, .8 * l, .32], [0, .6, 0, .5 * l, .2], [0, .64, -.5, .04, .04]], { rad: 12 })), Wt);
+  pm(g, pg('bd_tete', () => volume([[0, 1.95, .98, .05, .05], [0, 2.06, 1.3, .98, .9], [0, 2.04, 1.75, 1.14, .99], [0, 1.92, 2.14, 1.02, .82], [0, 1.86, 2.38, .7, .55], [0, 1.85, 2.48, .08, .08]], { sous: .15, rad: 18 })), c);
+  pm(g, pg('bd_museau', () => volume([[0, 1.72, 2.16, .05, .05], [0, 1.7, 2.38, .74, .42], [0, 1.7, 2.62, .6, .35], [0, 1.72, 2.74, .08, .08]], { rad: 14 })), D);
+  pm(g, pg('bd_machoire', () => volume([[0, 1.3, 1.9, .05, .05], [0, 1.24, 2.2, .66, .22], [0, 1.28, 2.6, .56, .2], [0, 1.33, 2.84, .08, .08]], { rad: 12 })), Cs);
+  pt(g, 'sph', '#0a0808', .19, .14, .1, 0, 1.92, 2.74);
+  pt(g, 'box', D, .74, .05, .1, 0, 2.08, 2.4, .5); pt(g, 'box', D, .6, .05, .1, 0, 2.24, 2.26, .7);            // plis du front
+  for (const s of [1, -1]) { pt(g, 'sph', c, .5, .62, .5, s * .58, 1.46, 2.28);                                        // bajoues
+    pt(g, 'cone', '#f6f1e4', .11, .34, .11, s * .32, 1.5, 2.7);                                                       // crocs du bas
+    pt(g, 'sph', glow('#ff1a0a', 3.2), .13, .1, .08, s * .42, 2.2, 2.42); pt(g, 'box', D, .52, .14, .2, s * .42, 2.38, 2.36, 0, 0, s * -.4);
+    pm(g, pg('qd_oreille', () => plaque(OREILLE_P, .09)), Cs, s * .98, 2.5, 1.5, .1, 0, s * -2.0, 1.3); }
+  const legs = []; for (const [x, z, av] of [[.92, .9, 1], [-.92, .9, 1], [.62, -1.15, 0], [-.62, -1.15, 0]]) { const L = grp(g, x * l, 1.0, z);
+    const J = grp(L, 0, 0, 0); J.rotation.z = Math.sign(x) * (av ? .22 : .1);                                          // pattes arquées
+    pm(J, pg('bd_patte', () => volume([[0, .15, 0, .05, .05], [0, 0, 0, .4, .42], [0, -.5, .02, .29, .3], [0, -.8, .04, .32, .36], [0, -.96, .1, .05, .05]], { rad: 12 })), c, 0, 0, 0, 0, 0, 0, av ? 1 : .86);
+    pt(J, 'sph', Wt, av ? .36 : .3, .16, av ? .42 : .36, 0, -.88, .12); legs.push(L); }
   const tail = grp(g, 0, 1.6, -1.6); pm(tail, pg('bd_queue', () => volume([[0, 0, .1, .05, .05], [0, .02, -.1, .2, .2], [0, .12, -.4, .12, .12], [0, .2, -.5, .03, .03]], { rad: 8 })), c);
   const col = new THREE.Mesh(GEO.tor, matMetal('#3a3a40')); col.scale.set(1, 1, 2.6); col.position.set(0, 1.62, 1.2); col.rotation.x = .25; g.add(col);
   for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283; pt(g, 'cone', matMetal('#c8ccd4'), .1, .42, .1, Math.cos(a) * 1.08, 1.62 + Math.sin(a) * 1.08, 1.2 + Math.sin(a) * .25, Math.PI / 2, 0, a - 1.571); }
   if (o.horn) pt(g, 'cone', '#d8d2c2', .2, 1.1, .2, .9, 1.9, 2.3, 1.2, 0, -.6);
-  if (o.king) { pt(g, 'cyl', matMetal('#ffd24a'), .62, .3, .62, 0, 2.92, 1.7); for (let i = 0; i < 6; i++) pt(g, 'cone', matMetal('#ffd24a'), .11, .42, .11, Math.cos(i * 1.047) * .55, 3.25, 1.7 + Math.sin(i * 1.047) * .55); pt(g, 'box', '#6a0a0a', 2.6, .12, 3, 0, 2.05, -.6, -.12); pt(g, 'sph', matMetal('#55585f'), 1.28, .7, 1.3, 0, 1.75, .2); const gr = new THREE.Mesh(GEO.ico, glow('#ffe9a0', 3)); gr.scale.setScalar(.3); gr.position.set(0, .75, 1.85); g.add(gr); }
+  if (o.king) { pt(g, 'cyl', matMetal('#ffd24a'), .62, .3, .62, 0, 2.98, 1.7); for (let i = 0; i < 6; i++) pt(g, 'cone', matMetal('#ffd24a'), .11, .42, .11, Math.cos(i * 1.047) * .55, 3.31, 1.7 + Math.sin(i * 1.047) * .55); pt(g, 'box', '#6a0a0a', 2.6, .12, 3, 0, 2.05, -.6, -.12); pt(g, 'sph', matMetal('#55585f'), 1.34, .7, 1.3, 0, 1.75, .2); const gr = new THREE.Mesh(GEO.ico, glow('#ffe9a0', 3)); gr.scale.setScalar(.3); gr.position.set(0, .75, 1.85); g.add(gr); }
   Object.assign(g.userData, { tail, legs }); return g;
 }
 
@@ -172,21 +176,35 @@ function mBulldog1(c, o = {}) {
    Même fonction qu'avant (appelée par le jeu pour ennemis, alliés et villageois), en plus fluide :
    départs et arrêts adoucis, balancement de la tête, queue qui remue, clignement des yeux. */
 function animChar2(o, dt, atk) {
-  const m = o.m, u = m.userData, A = u.an || (u.an = { k: o.moving ? 1 : 0, a: 0, bl: 1 + Math.random() * 4 });
+  const m = o.m, u = m.userData, A = u.an || (u.an = { k: o.moving ? 1 : 0, a: 0, bl: 1 + Math.random() * 4, lg: 0, h: 0, pa: false });
   A.k += ((o.moving ? 1 : 0) - A.k) * Math.min(1, dt * 10); A.a += ((atk ? 1 : 0) - A.a) * Math.min(1, dt * 16);
-  const t = o.t || 0, w = Math.sin(t * 11) * A.k;
+  if (A.pa && !atk) A.lg = 1; A.pa = !!atk; A.lg = Math.max(0, (A.lg || 0) - dt * 3.2);                 // l'élan se termine : le coup part
+  A.h = (A.h || 0) + (((o.hit > 0) ? 1 : 0) - (A.h || 0)) * Math.min(1, dt * 22);                        // coup reçu : recul
+  const t = o.t || 0, w = Math.sin(t * 11) * A.k, coup = Math.sin(A.lg * 3.1416);
   m.position.y = Math.abs(w) * .3; m.rotation.z = w * .1;
-  if (u.tail) { u.tail.rotation.x = Math.sin(t * 3) * .15 + A.k * .2; u.tail.rotation.y = Math.sin(t * 5.5) * (.1 + A.k * .12); }
-  if (u.neck) u.neck.rotation.x = lerp(Math.sin(t * 2) * .05 + Math.sin(t * 22) * .05 * A.k, .6, A.a);
-  if (u.legs) for (let i = 0; i < 4; i++) if (u.legs[i]) u.legs[i].rotation.x = Math.sin(t * 11 + (i % 3 ? 0 : 3.14)) * .6 * A.k;
+  m.rotation.x = -.22 * A.a + .32 * coup - .38 * A.h; m.position.z = -.25 * A.a + .8 * coup - .3 * A.h;   // se ramasse, bondit, encaisse
+  if (u.tail) { u.tail.rotation.x = Math.sin(t * 3) * .15 + A.k * .2 + A.a * .5; u.tail.rotation.y = Math.sin(t * 5.5) * (.1 + A.k * .12); }
+  if (u.neck) u.neck.rotation.x = lerp(Math.sin(t * 2) * .05 + Math.sin(t * 22) * .05 * A.k, -.35, A.a) + .9 * coup;
+  if (u.legs) for (let i = 0; i < 4; i++) if (u.legs[i]) u.legs[i].rotation.x = Math.sin(t * 11 + (i % 3 ? 0 : 3.14)) * .6 * A.k + (i < 2 ? -.5 : .3) * coup;
   if (u.legL) { u.legL.rotation.x = w * .75; u.legR.rotation.x = -w * .75; }
-  if (u.wl) { const f = lerp(lerp(.03 + Math.sin(t * 2.2) * .03, .1 + Math.abs(w) * .12, A.k), .55, A.a); u.wl.rotation.z = -f; u.wr.rotation.z = f; }
+  if (u.wl) { const f = lerp(lerp(.03 + Math.sin(t * 2.2) * .03, .1 + Math.abs(w) * .12, A.k), .7, Math.max(A.a, coup)) + A.h * .5; u.wl.rotation.z = -f; u.wr.rotation.z = f; }
   cligne(u, A, dt);
 }
 function cligne(u, A, dt) { if (!u.eyes) return; A.bl -= dt; u.eyes.scale.y = A.bl < .11 ? .12 : 1; if (A.bl < 0) A.bl = 1.8 + Math.random() * 4.5; }
 /* yeux de Plume et des villageois immobiles : le jeu ne passe pas par animChar pour eux */
 function persoTick(dt) {
-  if (typeof P !== 'undefined' && P.m) { const u = P.m.userData; cligne(u, u.an || (u.an = { bl: 2 }), dt); }
+  if (typeof P !== 'undefined' && P.m && state === 'play') { const m = P.m, u = m.userData, A = u.an || (u.an = { bl: 2, h: 0 }), sc = P.sc || 1; cligne(u, A, dt);
+    // le jeu pose Plume à chaque image ; on ajoute par-dessus les nuances de chaque état
+    A.h = (A.h || 0) + ((P.hurtT > .2 && !P.dead ? 1 : 0) - (A.h || 0)) * Math.min(1, dt * 20);
+    m.scale.x = m.scale.z = sc * (1 + A.h * .14); m.position.z = 0;
+    if (!P.dead && P.roll <= 0) {
+      if (P.atkT > 0) { const k = Math.sin((1 - P.atkT / .2) * 3.1416); m.position.z = k * .55; m.rotation.x += k * .12; u.wl.rotation.z -= k * .25; }           // fente
+      else if (P.swim) { const s = Math.sin(time * 9); u.legL.rotation.x = s * .9; u.legR.rotation.x = -s * .9; m.position.y += Math.sin(time * 3.2) * .09; m.rotation.x += Math.sin(time * 3.2 + 1) * .04; u.wl.rotation.z = -.22; u.wr.rotation.z = .22; u.neck.rotation.x = .12 + Math.sin(time * 3.2) * .05; }   // nage : pattes qui pagaient
+      else if (P.alt > .5) { u.legL.rotation.x = u.legR.rotation.x = 1.05; m.rotation.x += .16; u.neck.rotation.x = .3; }                                      // vol : pattes repliées, cou tendu
+      else if (P.walk) { m.rotation.x += .07; u.neck.rotation.x += Math.sin(P.walk * 2) * .05; }                                                                // course : penchée en avant
+      m.rotation.x -= A.h * .3;
+    } }
+  for (const d of DYING) { const k = Math.min(1, d.t / .55); d.m.position.y = Math.sin(k * 3.1416) * 1.3 - k * k * .6; d.m.rotation.x = -k * 1.3; }         // défaite : petit saut, puis à la renverse
   if (area === 'world') for (const n of NPCS) { if (Math.abs(n.x - P.x) > 70 || Math.abs(n.z - P.z) > 70) continue; const u = n.m.userData; cligne(u, u.an || (u.an = { k: 0, a: 0, bl: 1 + Math.random() * 4 }), dt); }
 }
 
