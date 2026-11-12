@@ -106,7 +106,7 @@ const TESTS = {
     assert(r.bad.length === 0, r.bad.slice(0, 8).join(' | ')); return p;
   },
   async rien_ne_change_dans_les_regles() {
-    const p = await ouvrir(); await nouvellePartie(p); await p.evaluate(() => { __dbg.P.x = -30; __dbg.P.z = 70; __dbg.adv(3); });
+    const p = await ouvrir(); await nouvellePartie(p); await p.evaluate(() => { __dbg.P.x = -30; __dbg.P.z = 70; __dbg.adv(3); if (__dbg.pnjMaison) __dbg.pnjMaison(); });
     const e = await p.evaluate(empreinte);
     if (process.env.GEN_REF) { fs.writeFileSync(REF, JSON.stringify(e, null, 1)); console.log('   (référence enregistrée)'); return p; }
     const ref = JSON.parse(fs.readFileSync(REF, 'utf8')), diff = Object.keys(ref).filter(k => String(ref[k]) !== String(e[k]));
@@ -137,7 +137,7 @@ const TESTS = {
     await passerDialogues(p); await p.waitForFunction(() => __dbg.S.q && __dbg.S.q.id === 'm1'); await p.evaluate(() => __dbg.adv(.2));
     assert((await p.evaluate(() => document.getElementById('qt').innerText)).includes('Le réveil de Plume'), 'suivi de quête absent');
     await placer(p, 20, 11); for (let i = 0; i < 10 && (await brigands(p)).length < 3; i++) await p.evaluate(() => { __dbg.S.hp = 114; __dbg.adv(.5); });
-    assert((await brigands(p)).length === 3, 'les 3 brigands de la quête ne sont pas apparus (' + (await brigands(p)).length + ')');
+    assert((await brigands(p)).length >= 3, 'les 3 brigands de la quête ne sont pas apparus (' + (await brigands(p)).length + ')');   // un brigand de passage peut s'y ajouter
     for (let i = 0; i < 80 && (await brigands(p)).length; i++) await p.evaluate(() => { const e = __dbg.ENT.find(e => !e.dead && e.hp > 0 && e.kind === 'brigand' && Math.hypot(e.x - 20, e.z - 5) < 25); if (!e) return; __dbg.P.x = e.x; __dbg.P.z = e.z + 2.2; __dbg.S.hp = 114; __dbg.attack(); __dbg.adv(.45); });
     await p.evaluate(() => __dbg.adv(1)); assert(await p.evaluate(() => __dbg.S.q && __dbg.S.q.step === 1), "l'étape de combat ne se valide pas");
     await parlerA(p, 'cacarde'); await passerDialogues(p); await p.waitForFunction(() => __dbg.S.qd.m1 === 1, null, { timeout: 20000 });
@@ -221,6 +221,26 @@ const TESTS = {
     await charger(p); await p.click('#bCont'); await p.click('#slots .sl[data-slot="1"]'); await p.waitForFunction(() => __dbg.state === 'play');
     const a = JSON.parse(fixture), r = await p.evaluate(() => { __dbg.adv(.5); __dbg.save(); return JSON.parse(localStorage.getItem('plume_gland_s1')); });
     for (const k of Object.keys(a)) assert(k in r, 'champ de sauvegarde perdu : ' + k); assert(r.gold === a.gold && r.lvl === a.lvl, 'sauvegarde d\'origine mal relue'); assert(p.errs.length === 0, p.errs.join(' | ')); return p;
+  },
+  async villageois_vivants() {
+    const p = await ouvrir(); await nouvellePartie(p); await placer(p, -30, 70);
+    // de jour : ils se promènent, sans s'éloigner ni traverser d'obstacle, et ceux qui ont une quête restent dehors
+    const a = await p.evaluate(() => { const d = __dbg; d.S.time = 108; let maxEcart = 0, horsSol = 0, bouges = 0, marqueDedans = 0; const loin = {}; const vus = new Set();
+      for (let i = 0; i < 240; i++) { d.adv(.5); d.S.time = 108; for (const n of d.PNJV.liste) { const e = Math.hypot(n.x - n.hx, n.z - n.hz); if (n.vie.etat === 'pause' && e <= 4.8) maxEcart = Math.max(maxEcart, e); if (n.vie.etat === 'pause' && e > 4.8) loin[n.id] = (loin[n.id] || 0) + 1; if (e > .5) vus.add(n.id); if (n.vie.etat === 'dedans' && n.markT) marqueDedans++;
+          if (n.vie.etat === 'marche') { const cx = n.col.x; n.col.x = 1e7; if (!d.walkable(n.x, n.z, .5)) horsSol++; n.col.x = cx; } } }
+      return { coince: Math.max(0, ...Object.values(loin)), n: d.PNJV.liste.length, bouges: vus.size, maxEcart, horsSol, marqueDedans, cacarde: d.NPCS.find(n => n.id === 'cacarde').vie.etat }; });
+    assert(a.n >= 60, 'villageois suivis : ' + a.n); assert(a.bouges >= 4, 'presque personne ne bouge : ' + a.bouges); assert(a.maxEcart <= 4.6, 'un villageois s\'éloigne trop : ' + a.maxEcart.toFixed(1));
+    assert(a.horsSol === 0, 'un villageois traverse un obstacle'); assert(a.coince < 60, 'un villageois reste coincé loin de sa place'); assert(a.marqueDedans === 0, 'un donneur de quête est rentré chez lui'); assert(a.cacarde !== 'dedans' && a.cacarde !== 'entre', 'la Doyenne (quête principale) est rentrée');
+    // on peut toujours parler au donneur de la quête principale et lancer la quête
+    await parlerA(p, 'cacarde'); await passerDialogues(p); await p.waitForFunction(() => __dbg.S.q && __dbg.S.q.id === 'm1', null, { timeout: 20000 });
+    // de nuit : certains rentrent ; en approchant de la porte, le villageois ressort et on peut lui parler
+    const b = await p.evaluate(() => { const d = __dbg; d.P.x = -30; d.P.z = 70; for (let i = 0; i < 200; i++) { d.S.time = 408; d.adv(.5); } const L = d.PNJV.liste.filter(n => n.vie.etat === 'dedans' && Math.hypot(n.hx, n.hz - 40) < 40); return { dedans: L.length, id: L[0] && L[0].id, visible: L[0] && L[0].g.visible }; });
+    assert(b.dedans >= 1, 'personne ne rentre chez soi la nuit'); assert(b.visible === false, 'villageois rentré mais encore visible');
+    const c = await p.evaluate(id => { const d = __dbg, n = d.NPCS.find(n => n.id === id); const w = d.nearWalk(n.x, n.z + 3); d.P.x = w[0]; d.P.z = w[1]; for (let i = 0; i < 6; i++) { d.S.time = 408; d.adv(.3); } return { etat: n.vie.etat, visible: n.g.visible, dist: Math.hypot(d.P.x - n.x, d.P.z - n.z) }; }, b.id);
+    assert(c.visible && c.etat !== 'dedans', 'le villageois ne ressort pas quand Plume approche (' + c.etat + ')'); assert(c.dist < 5.5, 'villageois ressorti hors de portée : ' + c.dist.toFixed(1));
+    // et tout le monde retrouve exactement sa place d'origine sur demande
+    assert(await p.evaluate(() => { __dbg.pnjMaison(); return __dbg.PNJV.liste.every(n => n.x === n.hx && n.z === n.hz && n.col.x === n.hx && n.col.r === 1.1 && n.g.visible); }), 'retour à la place d\'origine incomplet');
+    assert(p.errs.length === 0, p.errs.join(' | ')); return p;
   },
   async manette() {
     const p = await ouvrir({}, () => { const b = () => Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })); window.__pad = { connected: true, index: 0, id: 'test', mapping: 'standard', axes: [0, 0, 0, 0], buttons: b() }; navigator.getGamepads = () => [window.__pad]; });

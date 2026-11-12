@@ -28,6 +28,8 @@ npm run build
 |---|---|
 | `index.html` | Page, styles, HUD, menus, écran titre |
 | `src/jeu/` | Le jeu : données (`data*.js`), rendu (`gfx.js`), moteur (`game.js`), systèmes (`sys2.js`), démarrage (`boot.js`). Ces fichiers partagent un seul espace de noms et sont assemblés dans cet ordre par `vite.config.js`. |
+| `src/jeu/gfx2.js` | Le nouveau rendu : eau à reflets, sol texturé, matières, ciel, post-traitement |
+| `src/jeu/pnj_vie.js` | Les villageois se promènent et rentrent chez eux (sans jamais bloquer une quête) |
 | `src/three-compat.js` | Pont vers Three.js récent (garde le rendu d'origine tant que l'éclairage n'est pas refait) |
 | `src/outils/` | Outils de mise au point (compteur de fluidité) |
 | `tests/` | Filet de sécurité automatique et captures de comparaison |
@@ -38,7 +40,7 @@ npm run build
 npm test
 ```
 
-Seize tests (Playwright) : chargement, 285 quêtes valides, règles identiques au jeu d'origine (relief, zones praticables, positions, textes, équilibrage, caméra), nouvelle partie, déplacement, dialogue et quête, attaque, sort, nage, vol, donjon, construction, sauvegarde et emplacements, anciennes sauvegardes, manette, tactile et menus.
+Dix-sept tests (Playwright) : chargement, 285 quêtes valides, règles identiques au jeu d'origine (relief, zones praticables, positions, textes, équilibrage, caméra), nouvelle partie, déplacement, dialogue et quête, attaque, sort, nage, vol, donjon, construction, sauvegarde et emplacements, anciennes sauvegardes, manette, tactile et menus, villageois vivants.
 
 ```bash
 npm run captures
