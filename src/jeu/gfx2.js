@@ -54,6 +54,8 @@ function applyQuality2() {
   const pr = Math.min(window.devicePixelRatio || 1, [1, 1.25, 1.5][quality]); renderer.setPixelRatio(pr); const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
   sun.shadow.mapSize.set(quality ? 2048 : 1024, quality ? 2048 : 1024); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
   sun.shadow.radius = quality ? 2.2 : 1.2;
+  sun.shadow.camera.layers.enable(5);   // calque témoin : sans lui, le moteur reprendrait les calques de la caméra pour les ombres
+  if (quality > 0) sun.shadow.camera.layers.enable(4); else sun.shadow.camera.layers.disable(4);   // ombres portées des personnages : moyen et élevé seulement
   if (rtS) { rtS.dispose(); rtS = null; } if (MIR.rt) { MIR.rt.dispose(); MIR.rt = null; } MIR.on.value = 0; MIR.vu = false;
   composer = null; gradePass = null; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.CustomToneMapping; renderer.toneMappingExposure = 1.06;
   if (quality > 0 && THREE.FullScreenQuad && THREE.UnrealBloomPass) {
@@ -67,7 +69,8 @@ function applyQuality2() {
       const k = quality === 2 ? .5 : .34; MIR.rt = new THREE.WebGLRenderTarget(Math.round(Wd * k), Math.round(Hd * k), { format: THREE.RGBAFormat, type, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter }); MIR.tex.value = MIR.rt.texture;
     } catch (e) { if (rtS) rtS.dispose(); rtS = null; composer = null; gradePass = null; MIR.rt = null; renderer.outputColorSpace = THREE.SRGBColorSpace; }
   }
-  if (typeof GRASS !== 'undefined' && GRASS) GRASS.geometry.instanceCount = [0, 5000, 12000][quality];
+  if (typeof GRASS !== 'undefined' && GRASS) GRASS.geometry.instanceCount = [2500, 5000, 12000][quality];
+  if (typeof AMBI !== 'undefined' && AMBI) AMBI.geometry.setDrawRange(0, [140, 220, 300][quality]);   // particules d'ambiance : moins nombreuses (le jeu d'origine en dessinait 520)
 }
 /* y a-t-il de l'eau à l'écran ? (inutile de calculer le reflet sinon) */
 function eauEnVue() { const x = UP.value.x, z = UP.value.z; for (let i = -2; i <= 2; i++) for (let j = -2; j <= 1; j++) if (height(x + i * 22, z + j * 24 - 10) < .25) return true; return false; }
@@ -198,6 +201,22 @@ function solMaterial() {
   return tm;
 }
 
+/* Le sol est un seul grand quadrillage : on le découpe en dalles qui partagent les mêmes sommets (aucune couture,
+   même image) mais que le moteur peut ignorer quand elles sont hors de l'écran. Le relief et les collisions ne changent pas. */
+function terrainDalles(geo, mat, SEG, N = 10) {
+  const idx = geo.index.array, pos = geo.attributes.position, pas = Math.ceil(SEG / N), out = [];
+  for (let ty = 0; ty < N; ty++) for (let tx = 0; tx < N; tx++) {
+    const x0 = tx * pas, x1 = Math.min(SEG, x0 + pas), y0 = ty * pas, y1 = Math.min(SEG, y0 + pas); if (x0 >= x1 || y0 >= y1) continue;
+    const ii = new (idx.constructor)((x1 - x0) * (y1 - y0) * 6); let k = 0;
+    for (let iy = y0; iy < y1; iy++) { const b = (iy * SEG + x0) * 6, n = (x1 - x0) * 6; ii.set(idx.subarray(b, b + n), k); k += n; }
+    const g = new THREE.BufferGeometry(); for (const nom in geo.attributes) g.setAttribute(nom, geo.attributes[nom]); g.setIndex(new THREE.BufferAttribute(ii, 1));
+    let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9]; for (let q = 0; q < ii.length; q++) { const v = ii[q]; const X = pos.getX(v), Y = pos.getY(v), Z = pos.getZ(v); if (X < mn[0]) mn[0] = X; if (Y < mn[1]) mn[1] = Y; if (Z < mn[2]) mn[2] = Z; if (X > mx[0]) mx[0] = X; if (Y > mx[1]) mx[1] = Y; if (Z > mx[2]) mx[2] = Z; }
+    g.boundingBox = new THREE.Box3(new THREE.Vector3(...mn), new THREE.Vector3(...mx)); g.boundingSphere = g.boundingBox.getBoundingSphere(new THREE.Sphere());
+    const m = new THREE.Mesh(g, mat); m.receiveShadow = true; W.add(m); out.push(m);
+  }
+  return out;
+}
+
 /* ───────── MATIÈRES DES CONSTRUCTIONS ET DU DÉCOR ─────────
    Les couleurs viennent toujours du jeu (une par pièce). Le shader devine la matière d'après la forme et la teinte :
    pan incliné = toit de tuiles, brun sombre = bois, le reste = crépi/pierre ; puis il ajoute le grain et le relief. */
@@ -283,13 +302,13 @@ function buildDecorMeshes(L) {
 
 /* ───────── ASSEMBLAGE ───────── */
 function rendu2Init() {   // appelé à la fin de buildWorld
-  cam.layers.enable(1);
+  cam.layers.enable(1); cam.layers.enable(4); MIR.cam.layers.enable(4);
   WATER.material.dispose(); WATER.material = eauMaterial();
   buildCiel();
   SANSREFLET.push(WATER, GRASS, RAIN, AMBI);
   // particules d'ambiance : même nuage de points, mais une forme par biome (pétales, feuilles, flocons, braises, lucioles)
   { const u = AMBI.material.uniforms; u.uForme = UFORME; AMBI.material = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: u,
-      vertexShader: 'uniform vec3 uP,uVel;uniform float uT,uSize,uForme;varying float vA,vR;void main(){vR=fract(position.x*7.31+position.z*3.7);vec3 p=position+uVel*uT;p.xz=mod(p.xz-uP.xz+35.,70.)-35.+uP.xz;p.y=mod(p.y,22.)+uP.y+.4;p.x+=sin(uT*1.3+position.z)*(.7+step(.5,uForme)*step(uForme,1.5)*1.2);p.z+=cos(uT*1.1+position.x)*step(.5,uForme)*step(uForme,1.5)*.9;vec4 mv=viewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=uSize*(70./-mv.z)*(.6+fract(position.x*7.))*(1.+step(.5,uForme)*step(uForme,1.5)*.9)*' + (Math.min(window.devicePixelRatio || 1, 2)).toFixed(2) + ';vA=.5+.5*sin(uT*3.+position.y*9.);}',
+      vertexShader: 'uniform vec3 uP,uVel;uniform float uT,uSize,uForme;varying float vA,vR;void main(){vR=fract(position.x*7.31+position.z*3.7);vec3 p=position+uVel*uT;p.xz=mod(p.xz-uP.xz+35.,70.)-35.+uP.xz;p.y=mod(p.y,22.)+uP.y+.4;p.x+=sin(uT*1.3+position.z)*(.7+step(.5,uForme)*step(uForme,1.5)*1.2);p.z+=cos(uT*1.1+position.x)*step(.5,uForme)*step(uForme,1.5)*.35;vec4 mv=viewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=uSize*(70./-mv.z)*(.6+fract(position.x*7.))*(1.+step(.5,uForme)*step(uForme,1.5)*.35)*' + (Math.min(window.devicePixelRatio || 1, 2)).toFixed(2) + ';vA=.5+.5*sin(uT*3.+position.y*9.);}',
       fragmentShader: `uniform vec3 uCol;uniform float uA,uForme,uT;varying float vA,vR;
        void main(){vec2 q=gl_PointCoord-.5;float feuille=step(.5,uForme)*step(uForme,1.5);float a=vR*6.283+uT*(1.+vR*2.5)*feuille;q=mat2(cos(a),-sin(a),sin(a),cos(a))*q;
         float d=length(q*vec2(1.,1.+feuille*(1.4+sin(uT*3.+vR*9.)*.9)));if(d>.5)discard;
@@ -308,6 +327,9 @@ function rendu2Tick(dt, px, py, pz, tod, bi) {   // appelé à la fin de gfxTick
   } else { hemi.color.setRGB(1, 1, 1); UNUIT.value = 1; if (DG && DGp.userData.deco !== DG && DGp.children.length) { DGp.userData.deco = DG; donjonDeco(); } }
   if (CIEL) { CIEL.position.copy(cam.position); CIEL.visible = area === 'world'; }
   if (area === 'world') UFORME.value = FORMES[bi] || 0;
+  // ciel plus léger : 4 nuages sur 9, plus transparents, plus petits, et qui s'effacent bien avant de passer devant Plume
+  CLD.forEach((c, i) => { if (i >= 4) { c.visible = false; return; } if (!c.userData.r2) { c.userData.r2 = 1; c.scale.setScalar(.72); }
+    const d = Math.hypot(c.position.x - px, c.position.z - pz - 18); c.userData.m.opacity *= .5 * sstep(22, 42, d); });
   const nage = area === 'world' && typeof P !== 'undefined' && P.g && !P.fly && height(px, pz) < -.05 ? 1 : 0;
   URIP.value.set(px, pz, 0, lerp(URIP.value.w, nage, Math.min(1, dt * 4)));
 }

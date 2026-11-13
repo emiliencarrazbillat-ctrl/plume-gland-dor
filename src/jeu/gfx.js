@@ -179,7 +179,7 @@ function buildTerrain(){
   const cc=document.createElement('canvas');cc.width=cc.height=256;const cx=cc.getContext('2d'),cr=rng(19);cx.fillStyle='#fff';cx.fillRect(0,0,256,256);for(let i=0;i<34;i++){const x=cr()*256,y=cr()*256,rr=22+cr()*46;for(const ox of[-256,0,256])for(const oy of[-256,0,256]){const gd=cx.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,rr);gd.addColorStop(0,'rgba(0,0,0,.5)');gd.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=gd;cx.fillRect(x+ox-rr,y+oy-rr,rr*2,rr*2);}}
   CT=new THREE.CanvasTexture(cc);CT.wrapS=CT.wrapT=THREE.RepeatWrapping;
   solBiomes(geo);const tm=solMaterial();
-  const terr=new THREE.Mesh(geo,tm);terr.receiveShadow=true;W.add(terr);
+  terrainDalles(geo,tm,SEG);   /* sol découpé en dalles : voir gfx2.js */
   // eau
   WATER=new THREE.Mesh(new THREE.PlaneGeometry(3200,3200),new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uT:UT,uH:{value:HT},uW:{value:WT},uCl:{value:CT},uFog:{value:scene.fog.color},uLight:ULIGHT,uSun:USUN,uFn:UFN,uFf:UFF},
     vertexShader:'varying vec3 vW;varying float vD;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vD=-mv.z;gl_Position=projectionMatrix*mv;}',

@@ -11,7 +11,7 @@
 /* Volume « balayé » : une suite d'anneaux [x,y,z,rayonX,rayonY] reliés en douceur (corps, cou, queue…).
    opt.sous : assombrit le dessous (0 à 1) pour donner du volume ; opt.rad : finesse du contour. */
 function volume(an, opt = {}) {
-  const RAD = opt.rad || 14, SUB = opt.sub || 4, n = an.length, cr = (a, b, c, d, t) => .5 * ((2 * b) + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (-a + 3 * b - 3 * c + d) * t * t * t);
+  const RAD = Math.max(8, Math.round((opt.rad || 14) * .8)), SUB = opt.sub || 3, n = an.length, cr = (a, b, c, d, t) => .5 * ((2 * b) + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (-a + 3 * b - 3 * c + d) * t * t * t);
   const S = []; for (let i = 0; i < n - 1; i++) for (let s = 0; s < SUB; s++) { const t = s / SUB, p0 = an[Math.max(0, i - 1)], p1 = an[i], p2 = an[i + 1], p3 = an[Math.min(n - 1, i + 2)]; S.push([0, 1, 2, 3, 4].map(k => cr(p0[k], p1[k], p2[k], p3[k], t))); } S.push(an[n - 1].slice(0, 5));
   for (const s of S) { s[3] = Math.max(.004, s[3]); s[4] = Math.max(.004, s[4]); }
   const M = S.length, pos = [], col = [], idx = [], T = new THREE.Vector3(), X = new THREE.Vector3(), N = new THREE.Vector3(), A = new THREE.Vector3(), sous = opt.sous || 0;
@@ -211,3 +211,8 @@ function persoTick(dt) {
 /* branchement : le jeu appelle animChar ; on y met la version fluide, et on ajoute les clignements à chaque image */
 animChar = animChar2;
 { const u0 = update; update = function (dt) { u0(dt); persoTick(dt); }; }
+
+/* Les corps des personnages vont sur un calque à part (4) : la caméra les voit toujours, mais au niveau de qualité bas
+   le soleil ne les prend plus pour calculer les ombres (leur ombre ronde au sol reste). Plume garde sa vraie ombre. */
+{ const ci0 = charInst; charInst = function (...a) { const m = ci0(...a); for (const c of m.userData.cols) c.layers.set(4); return m; }; }
+{ const t0 = persoTick; persoTick = function (dt) { t0(dt); if (P.m && !P.m.userData.l0) { for (const c of P.m.userData.cols) c.layers.enable(0); P.m.userData.l0 = 1; } }; }

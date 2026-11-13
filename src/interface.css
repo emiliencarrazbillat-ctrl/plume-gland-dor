@@ -111,3 +111,12 @@ kbd { font-family: var(--titre); background: linear-gradient(#ffe58a, #f2a91e); 
 .sl { flex-wrap: wrap; }
 .sl small { flex: 1 1 9em; }
 .sl .btn { flex: none; margin-left: auto; }
+
+/* ── écran de chargement ── */
+#charge { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6em; background: radial-gradient(ellipse at 50% 40%, #4a2c12, #1a0f06 75%); transition: opacity .5s; }
+#charge.fin { opacity: 0; pointer-events: none; }
+#charge h1 { font-family: var(--titre); font-weight: 700; font-size: 5em; color: var(--or3); -webkit-text-stroke: .1em var(--bois); paint-order: stroke fill; text-shadow: 0 .07em 0 var(--bois), 0 0 .8em rgba(255,190,80,.4); text-align: center; line-height: 1.05; padding: 0 .5em; }
+#charge .cbar { width: 28em; max-width: 80%; height: 1.5em; border-radius: 1em; background: var(--bois); box-shadow: var(--relief); overflow: hidden; }
+#charge .cbar i { display: block; height: 100%; width: 3%; border-radius: 1em; background: linear-gradient(#ffe58a, #f2a91e); box-shadow: inset 0 .3em 0 rgba(255,255,255,.4); transition: width .25s; }
+#charge p { font-family: var(--texte); font-weight: 700; font-size: 1.5em; color: var(--creme); }
+@media (max-aspect-ratio: 4/5) { #charge h1 { font-size: 7.5em; } #charge p { font-size: 2.4em; } #charge .cbar { height: 2.2em; } }
