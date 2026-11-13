@@ -33,6 +33,7 @@ npm run build
 | `src/jeu/effets.js` | Effets de combat et de sorts ajoutés par-dessus ceux du jeu (halos, flammes, cristaux, lumière) |
 | `src/jeu/maisons.js` | Maisons des autres villages, forts, entrées et habillage des donjons |
 | `src/jeu/pnj_vie.js` | Les villageois se promènent et rentrent chez eux (sans jamais bloquer une quête) |
+| `src/interface.css` | Style de l'interface (bois, parchemin et or) : couleurs, polices, ombres ; aucune réorganisation |
 | `src/three-compat.js` | Pont vers Three.js récent (garde le rendu d'origine tant que l'éclairage n'est pas refait) |
 | `src/outils/` | Outils de mise au point (compteur de fluidité) |
 | `tests/` | Filet de sécurité automatique et captures de comparaison |
@@ -49,6 +50,6 @@ Dix-sept tests (Playwright) : chargement, 285 quêtes valides, règles identique
 npm run captures
 ```
 
-Prend des captures toujours aux mêmes endroits et aux mêmes heures (dossier `captures/`).
+Prend des captures toujours aux mêmes endroits et aux mêmes heures (dossier `captures/`). `node tests/captures_ui.cjs dist captures/ui` capture l'interface (titre, dialogue, chaque onglet du menu) sur ordinateur et téléphone.
 
 Ressources et licences : voir `CREDITS.md`.

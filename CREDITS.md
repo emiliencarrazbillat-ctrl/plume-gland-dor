@@ -10,6 +10,13 @@ Chaque ressource utilisée par le jeu est notée ici avec sa source et sa licenc
 | Vite 8 | Outil de construction (non livré avec le jeu) | https://vite.dev | MIT |
 | Playwright | Tests automatiques (non livré avec le jeu) | https://playwright.dev | Apache 2.0 |
 
+## Polices
+
+| Police | Usage | Source | Licence |
+|---|---|---|---|
+| Fredoka | Titres, boutons, noms | https://fonts.google.com/specimen/Fredoka (paquet `@fontsource/fredoka`) | SIL Open Font License 1.1 |
+| Nunito | Textes, dialogues, menus | https://fonts.google.com/specimen/Nunito (paquet `@fontsource/nunito`) | SIL Open Font License 1.1 |
+
 ## Textures
 
 Toutes viennent de Poly Haven (https://polyhaven.com), licence CC0 (domaine public, usage commercial libre, sans attribution obligatoire). Résolution d'origine 1K, converties en WebP dans `src/assets/tex/` (`_c` = couleur, `_n` = relief).

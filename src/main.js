@@ -1,3 +1,10 @@
+import '@fontsource/fredoka/latin-500.css';
+import '@fontsource/fredoka/latin-600.css';
+import '@fontsource/fredoka/latin-700.css';
+import '@fontsource/nunito/latin-600.css';
+import '@fontsource/nunito/latin-700.css';
+import '@fontsource/nunito/latin-800.css';
+import './interface.css';
 import './three-compat.js';
 import './rendu/ressources.js';
 import 'virtual:jeu';

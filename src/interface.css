@@ -1,0 +1,113 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+   Interface refaite : un seul style « bois, parchemin et or », le même que le HUD.
+   Uniquement des couleurs, matières, polices et ombres : aucun élément ne change de place.
+   ═══════════════════════════════════════════════════════════════════════════════════════════ */
+:root {
+  --bois: #2a1608; --bois2: #3d2410; --bois3: #5a3a1c; --or: #ffd24a; --or2: #f2a91e; --or3: #ffe58a;
+  --creme: #f8eed6; --parch: #f6e6bf; --parch2: #e8cf98; --encre: #3a2206;
+  --titre: 'Fredoka', 'Trebuchet MS', Verdana, sans-serif; --texte: 'Nunito', 'Trebuchet MS', Verdana, sans-serif;
+  --panneau: linear-gradient(rgba(64,38,16,.97), rgba(38,22,9,.97));
+  --relief: 0 0 0 .14em var(--or), 0 0 0 .3em var(--bois), 0 .4em 0 .3em rgba(0,0,0,.35);
+}
+html, body, .ft { font-family: var(--texte); }
+html, body { background: #120a04; }
+.sh, #zone, #toast, #qt, #qt2 { font-family: var(--texte); }
+#zone:not(:empty), #toast, #lvl, #bname, .sp small, #hud .row b { font-family: var(--titre); letter-spacing: .02em; }
+kbd { font-family: var(--titre); background: linear-gradient(#ffe58a, #f2a91e); color: var(--encre); border: .12em solid var(--bois); border-radius: .4em; box-shadow: 0 .14em 0 var(--bois); padding: 0 .35em; font-weight: 600; }
+
+/* ── boutons ── */
+.btn, #dch button {
+  font-family: var(--titre); font-weight: 600; color: var(--encre); background: linear-gradient(#ffe58a, #f2a91e); border: .14em solid var(--bois);
+  border-radius: .8em; box-shadow: inset 0 .2em 0 rgba(255,255,255,.55), inset 0 -.2em 0 rgba(150,80,0,.35), 0 .22em 0 var(--bois); transition: transform .08s, filter .12s;
+}
+.btn:hover, #dch button:hover, #dch button.sel { background: linear-gradient(#fff3b8, #ffc23a); color: var(--encre); border-color: var(--bois); filter: brightness(1.04); transform: translateY(-.08em); }
+.btn:active, #dch button:active { transform: translateY(.12em); box-shadow: inset 0 .2em 0 rgba(255,255,255,.4), 0 .08em 0 var(--bois); }
+.btn.sm { font-size: .88em; padding: .2em .8em; border-radius: .6em; }
+.btn.on { background: linear-gradient(#9fe0ff, #3f9ff0); color: #0d2238; }
+.btn.off { filter: grayscale(1) brightness(.7); }
+.btn:focus-visible, .nav:focus-visible, #dch button:focus-visible { outline: .18em solid #9fe0ff; outline-offset: .15em; }
+
+/* ── écran titre et emplacements ── */
+.screen { background: radial-gradient(ellipse at 50% 32%, rgba(255,214,140,.12), rgba(30,16,6,.35) 45%, rgba(14,8,3,.88) 88%); }
+.screen h1 {
+  font-family: var(--titre); font-weight: 700; font-size: 6.2em; line-height: 1; color: var(--or3); letter-spacing: .01em;
+  -webkit-text-stroke: .1em var(--bois); paint-order: stroke fill; text-shadow: 0 .07em 0 var(--bois), 0 .13em 0 rgba(0,0,0,.35), 0 0 .8em rgba(255,190,80,.45);
+  background: none;
+}
+.screen h1::after { content: ''; display: block; margin: .18em auto 0; width: 3.6em; height: .09em; border-radius: 1em; background: linear-gradient(90deg, transparent, var(--or), transparent); }
+.screen h2 { font-family: var(--texte); font-style: normal; font-weight: 700; font-size: 1.7em; color: var(--creme); opacity: 1; text-shadow: 0 .08em 0 var(--bois), 0 0 .6em rgba(0,0,0,.8); }
+.screen .btn:not(.sm) { font-size: 2.1em; padding: .4em 1.8em; border-width: .1em; border-radius: .75em; }
+#slots .btn.sm { font-size: .9em; padding: .2em .8em; min-width: 0; border-width: .12em; }
+.screen p { background: var(--panneau); color: var(--creme); border-radius: 1em; padding: .8em 1.4em; box-shadow: var(--relief); font-size: 1.25em; line-height: 1.85; text-shadow: none; }
+#slots { background: var(--panneau) !important; border: none !important; box-shadow: var(--relief) !important; }
+#slots h3 { font-family: var(--titre); color: var(--or3); font-weight: 600; letter-spacing: .02em; }
+.sl { background: linear-gradient(rgba(255,236,190,.1), rgba(255,236,190,.04)); border: .12em solid rgba(255,210,74,.35); border-radius: .8em; }
+.sl:hover, .sl.padf { background: rgba(255,210,74,.18); border-color: var(--or); }
+.sl b { font-family: var(--titre); font-weight: 600; color: var(--or3); }
+
+/* ── dialogue : un parchemin ── */
+#dlg {
+  background: linear-gradient(#fbf1d8, #efdcae); color: var(--encre); border: .2em solid var(--bois); border-radius: 1.1em; font-family: var(--texte); font-weight: 600;
+  box-shadow: 0 0 0 .18em var(--or), 0 0 0 .38em var(--bois), 0 .55em 0 .3em rgba(0,0,0,.35), inset 0 0 1.6em rgba(160,100,30,.25);
+}
+#dlg::before { content: ''; position: absolute; inset: .45em; border: .1em dashed rgba(120,72,20,.35); border-radius: .7em; pointer-events: none; }
+#dname { font-family: var(--titre); font-weight: 600; letter-spacing: .02em; color: var(--encre); background: linear-gradient(#ffe58a, #f2a91e); border: .14em solid var(--bois); border-radius: .7em; box-shadow: 0 .18em 0 var(--bois); top: -1.25em; }
+#dnext { color: var(--bois3); }
+#dch button { text-align: left; }
+
+/* ── bulles d'aide, annonces, zone ── */
+#hint span { font-family: var(--titre); font-weight: 500; letter-spacing: .01em; }
+#toast { color: var(--or3); -webkit-text-stroke: .18em var(--bois); text-shadow: 0 .1em 0 var(--bois), 0 0 .7em rgba(0,0,0,.6); }
+.qarrow { color: var(--or); -webkit-text-stroke: .1em var(--bois); paint-order: stroke fill; }
+
+/* ── barre de sorts ── */
+.sp span { filter: drop-shadow(0 .08em 0 rgba(0,0,0,.5)); }
+.sp:not(.off):hover { transform: translateY(-.15em); }
+.sp.low { filter: grayscale(.85) brightness(.75); }
+
+/* ── menu : un grand panneau de bois ── */
+#menu { background: radial-gradient(ellipse at 60% 0%, rgba(120,72,28,.35), transparent 60%), linear-gradient(#2c1a0b, #1a0f06); font-family: var(--texte); }
+#side { background: linear-gradient(90deg, rgba(0,0,0,.3), rgba(0,0,0,.15)); border-right: .2em solid var(--bois); box-shadow: inset -.12em 0 0 rgba(255,210,74,.35); }
+.nav { font-family: var(--titre); font-weight: 500; color: #f0dfbc; border: .12em solid transparent; letter-spacing: .01em; }
+.nav:hover { background: rgba(255,210,74,.12); border-color: rgba(255,210,74,.3); }
+.nav.on { background: linear-gradient(#ffe58a, #f2a91e); color: var(--encre); border-color: var(--bois); box-shadow: inset 0 .16em 0 rgba(255,255,255,.5), 0 .18em 0 var(--bois); }
+#mhead { background: rgba(0,0,0,.25); border-bottom: .16em solid var(--bois); box-shadow: 0 .1em 0 rgba(255,210,74,.25); color: var(--creme); }
+#mhead b { font-family: var(--titre); font-weight: 600; color: var(--or3); }
+#mbody h3 { font-family: var(--titre); font-weight: 600; color: var(--or3); letter-spacing: .02em; text-shadow: 0 .08em 0 var(--bois); }
+#mbody { color: var(--creme); }
+.q { background: linear-gradient(rgba(255,236,190,.1), rgba(255,236,190,.05)); border-left: .3em solid var(--or2); border-radius: .5em; box-shadow: 0 .1em 0 rgba(0,0,0,.3); }
+.q b { color: var(--or3); font-family: var(--titre); font-weight: 600; letter-spacing: .01em; }
+.q.done { border-color: #6fbf4a; }
+.it { background: rgba(255,236,190,.07); border-radius: .5em; }
+.it:hover { border-color: rgba(255,210,74,.6); }
+.it.eq { border-color: var(--or); background: rgba(255,210,74,.16); }
+.chip { font-family: var(--titre); font-weight: 500; }
+#mapc { border: .2em solid var(--bois); box-shadow: 0 0 0 .16em var(--or), 0 .35em 0 .2em rgba(0,0,0,.4); border-radius: .7em; }
+#menu ::-webkit-scrollbar { width: .6em; } #menu ::-webkit-scrollbar-thumb { background: var(--bois3); border-radius: 1em; } #menu ::-webkit-scrollbar-track { background: rgba(0,0,0,.25); }
+
+/* ── pêche, boss ── */
+#fish { background: linear-gradient(#fbf1d8, #efdcae); color: var(--encre); border: .2em solid var(--bois); box-shadow: 0 0 0 .18em var(--or), 0 0 0 .38em var(--bois), 0 .5em 0 .3em rgba(0,0,0,.35); font-family: var(--texte); font-weight: 700; }
+#fish h3 { font-family: var(--titre); color: var(--bois3); font-weight: 600; }
+#fbar { border-color: var(--bois); }
+
+/* ── commandes tactiles ── */
+.tb { background: radial-gradient(circle at 50% 35%, rgba(90,58,28,.75), rgba(42,22,8,.75)); border: .25em solid rgba(255,210,74,.75); box-shadow: 0 .25em 0 rgba(0,0,0,.35); }
+#tA { background: radial-gradient(circle at 50% 35%, rgba(255,214,110,.85), rgba(200,120,20,.8)); border-color: var(--bois); }
+#tknob { border-color: rgba(255,210,74,.5); background: rgba(42,22,8,.3); }
+#tknob i { background: radial-gradient(circle at 50% 35%, #ffe58a, #f2a91e); box-shadow: 0 .2em 0 var(--bois); }
+
+/* ── téléphone en vertical : menus, dialogue et titre plus grands (rien ne bouge) ── */
+@media (max-aspect-ratio: 4/5) {
+  #menu { font-size: 2.15em; } #side { width: 11.5em; padding: .8em .4em; } .nav { padding: .5em .5em; gap: .45em; }
+  #mbody { flex-direction: column; padding: 1em; gap: .8em; } #mhead { white-space: normal; }
+  #dlg { font-size: 2.6em; left: 4%; right: 4%; }
+  .screen h1 { font-size: 7.6em; } .screen h2 { font-size: 2.4em; } .screen .btn:not(.sm) { font-size: 3em; } .screen p { font-size: 1.7em; } #slots { font-size: 1.8em; }
+  #toast { font-size: 3em; } #hint { font-size: 2.2em; }
+}
+@media (prefers-reduced-motion: reduce) { .btn, .sp, #dch button { transition: none; } #dnext { animation: none; } }
+.screen p:empty { display: none; }
+/* emplacements : « Effacer » reste à droite et passe à la ligne si la place manque, pour qu'un clic au milieu charge toujours la partie */
+#slots { width: 30em; max-width: 100%; }
+.sl { flex-wrap: wrap; }
+.sl small { flex: 1 1 9em; }
+.sl .btn { flex: none; margin-left: auto; }
