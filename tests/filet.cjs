@@ -257,6 +257,12 @@ const TESTS = {
   async tactile_et_menus() {
     const p = await ouvrir({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 780 } }); await nouvellePartie(p);
     assert(await p.evaluate(() => getComputedStyle(document.getElementById('touch')).display === 'block'), 'commandes tactiles absentes');
+    // les sorts répondent au doigt (la zone du joystick ne les couvre pas)
+    await p.evaluate(() => { __dbg.S.sp[0] = 1; __dbg.S.mp = 100; __dbg.adv(.1); });
+    const sp = await p.evaluate(() => { const r = document.querySelector('#spells .sp').getBoundingClientRect(), e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { x: r.x + r.width / 2, y: r.y + r.height / 2, dessus: e && (e.closest('#spells') ? 'sort' : e.id || e.className) }; });
+    assert(sp.dessus === 'sort', 'le premier sort est recouvert par : ' + sp.dessus);
+    await p.touchscreen.tap(sp.x, sp.y); await p.evaluate(() => __dbg.adv(.2));
+    assert(await p.evaluate(() => __dbg.S.mp) < 90, 'toucher le premier sort ne le lance pas');
     await p.tap('#tM'); await p.waitForTimeout(400);
     const tabs = await p.evaluate(() => document.getElementById('side').innerText); for (const t of ['Quêtes', 'Carte', 'Équipement', 'Armée', 'Village', 'Clans', 'options', 'Manette', 'Sauvegarder']) assert(tabs.includes(t), 'onglet de menu manquant : ' + t);
     assert(p.errs.length === 0, p.errs.join(' | ')); return p;

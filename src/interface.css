@@ -120,3 +120,22 @@ kbd { font-family: var(--titre); background: linear-gradient(#ffe58a, #f2a91e); 
 #charge .cbar i { display: block; height: 100%; width: 3%; border-radius: 1em; background: linear-gradient(#ffe58a, #f2a91e); box-shadow: inset 0 .3em 0 rgba(255,255,255,.4); transition: width .25s; }
 #charge p { font-family: var(--texte); font-weight: 700; font-size: 1.5em; color: var(--creme); }
 @media (max-aspect-ratio: 4/5) { #charge h1 { font-size: 7.5em; } #charge p { font-size: 2.4em; } #charge .cbar { height: 2.2em; } }
+
+/* ═══ Téléphone en vertical : HUD agrandi et réorganisé (ordinateur et paysage inchangés) ═══
+   Haut : nom de la zone. Puis portrait et barres sur toute la largeur, minicarte à droite.
+   Dessous : suivi de quête sur toute la largeur. Bas : sorts et commandes tactiles agrandis. */
+@media (max-aspect-ratio: 4/5) {
+  #zone { top: .5em; } #zone:not(:empty) { font-size: 2.5em; padding: .1em 1em; max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
+  #hud { font-size: 1.9em; left: 2.5%; right: 2.5%; top: 3.4em; width: auto; }
+  #htop, #hud > .row { margin-right: 10.4em; }
+  #mini { position: absolute; right: 0; top: 0; width: 9.6em !important; height: 9.6em !important; margin: 0; }
+  #qt, #qt2, #qt:not(:empty), #qt2:not(:empty) { left: 2.5%; right: 2.5%; width: auto; font-size: 2.15em; text-align: left; }
+  #qt { top: 22.5em; } #qt2 { top: auto; bottom: 30%; }
+  #boss { top: auto; bottom: 24%; left: 6%; right: 6%; font-size: 2.2em; }
+  #spells { font-size: 1.75em; bottom: .8em; gap: .45em; }
+  #touch { font-size: 1.65em; }
+  #tM { top: 24em; }                                    /* menu : sous le suivi de quête */
+  #tjoy { height: auto; bottom: 9%; }                   /* la zone du joystick s'arrête au-dessus des sorts, qui restent touchables */
+  #tknob { bottom: 8.5em; }
+  #fts { font-size: 1.6em; }
+}
